@@ -43,6 +43,8 @@ h1,h2,h3,h4{font-family:var(--display);font-weight:400;letter-spacing:.02em}
 .btn.ghost{border-color:var(--gold-line);color:var(--gold-deep)}
 .btn.ghost:hover{background:var(--gold-soft);color:var(--gold-deep)}
 .btn:disabled{opacity:.4;cursor:not-allowed;background:#fff;color:var(--ink)}
+.btn.danger{color:#9a2a2a;border-color:#e6cfcf}
+.btn.danger:hover{background:#fbeeee;border-color:#d99;color:#7e1f1f}
 .upd-msg{font-size:12px;font-weight:700;color:var(--green);white-space:nowrap;align-self:center}
 .cloud-status{font-size:11.5px;font-weight:700;color:var(--muted);white-space:nowrap;align-self:center;letter-spacing:.02em}
 .cloud-status.ok{color:var(--green)} .cloud-status.err{color:var(--red)} .cloud-status.muted{color:var(--muted2)} .cloud-status.busy{color:var(--gold-deep)}
@@ -258,6 +260,7 @@ tr.topay td,tr.topay:hover td{background:var(--red-row)}
     <span class="upd-msg no-print" id="updMsg"></span>
     <button class="btn ghost no-print" id="updateBtn" style="display:none">🔄 Aggiorna</button>
     <button class="btn ghost no-print" id="reloadBtn" style="display:none">📅 Nuova data</button>
+    <button class="btn ghost no-print danger" id="resetBtn" title="Cancella tutti i dati, anche dal cloud, per tutti i dispositivi">🗑 Svuota tutto</button>
     <button class="btn solid no-print" id="printBtn" disabled>Stampa</button>
     <button class="btn ghost no-print" id="logoutBtn" title="Esci e blocca l'accesso">Esci</button>
     <input type="file" id="updateInput" accept=".xls,.xlsx" hidden>
@@ -831,8 +834,8 @@ document.getElementById('searchBox').addEventListener('input',e=>{SEARCH=e.targe
 const updateInput=document.getElementById('updateInput');
 document.getElementById('updateBtn').onclick=()=>updateInput.click();
 updateInput.onchange=e=>{ if(e.target.files[0])handleFile(e.target.files[0],true); updateInput.value=''; };
-document.getElementById('reloadBtn').onclick=()=>{
-  DATA=ENR=null;SEARCH='';
+function resetView(){
+  DATA=ENR=null; LASTSIG=null; SEARCH='';
   const sb=document.getElementById('searchBox'); if(sb)sb.value='';
   document.getElementById('dropArea').style.display='block';
   document.getElementById('tabs').style.display='none';
@@ -840,9 +843,15 @@ document.getElementById('reloadBtn').onclick=()=>{
   document.getElementById('printBtn').disabled=true;
   document.getElementById('reloadBtn').style.display='none';
   document.getElementById('updateBtn').style.display='none';
-  document.getElementById('updMsg').textContent='';
   document.getElementById('exportInfo').textContent='Nessun file caricato';
   input.value='';
+}
+document.getElementById('reloadBtn').onclick=()=>{ document.getElementById('updMsg').textContent=''; resetView(); };
+document.getElementById('resetBtn').onclick=()=>{
+  if(!confirm('Azzerare TUTTO e ripartire puliti?\n\nVengono cancellati i dati anche dal cloud, quindi spariscono da TUTTI i dispositivi collegati. Operazione non reversibile.')) return;
+  try{ if(window.cloudClear) window.cloudClear(); }catch(e){}
+  resetView();
+  const um=document.getElementById('updMsg'); if(um){ um.textContent='Tutto azzerato ✓'; setTimeout(()=>{um.textContent='';},5000); }
 };
 
 /* ===== Autenticazione (utente/password con "Ricorda") ===== */
@@ -936,10 +945,19 @@ try{
     unsub = onValue(planRef, snap=>{
       const data = snap.val();
       if(data){ setStatus('☁︎ Sincronizzato','ok'); if(window.cloudReceive) window.cloudReceive(data); }
-      else { setStatus('☁︎ Cloud vuoto · carica un file','muted'); }
+      else { setStatus('☁︎ Cloud vuoto · carica un file','muted'); if(window.resetView) window.resetView(); }
     }, err=>{ console.error(err); setStatus('☁︎ Cloud non accessibile (regole/URL)','err'); });
   };
   window.cloudStop = ()=>{ if(unsub){ try{unsub();}catch(e){} unsub=null; } setStatus('☁︎ In attesa di accesso','muted'); };
+
+  // Svuota completamente i dati sul cloud (per tutti i dispositivi)
+  window.cloudClear = ()=>{
+    if(!window.__authed) return;
+    setStatus('☁︎ Azzeramento…','busy');
+    set(planRef, null)
+      .then(()=>setStatus('☁︎ Cloud svuotato','muted'))
+      .catch(err=>{ console.error(err); setStatus('☁︎ Azzeramento non riuscito','err'); });
+  };
 
   setStatus('☁︎ In attesa di accesso','muted');
   if(window.__authed) window.cloudStart();   // se l'utente era già ricordato
