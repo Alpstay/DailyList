@@ -201,6 +201,11 @@ td.rn,td.num{font-weight:700;font-variant-numeric:tabular-nums}
 td.rn{font-size:15px;color:var(--ink)}
 tr.collected td,tr.collected:hover td{background:var(--green-bg)}
 tr.topay td,tr.topay:hover td{background:var(--red-row)}
+tr.partiti td,tr.partiti:hover td{background:var(--green-bg)}
+tr.partiti td.rn{box-shadow:inset 3px 0 0 var(--green);font-weight:800}
+tr.arrivo td,tr.arrivo:hover td{background:#fff8ec}
+tr.arrivo td.rn{box-shadow:inset 3px 0 0 #d9a441}
+tr.cambio td.rn{box-shadow:inset 3px 0 0 var(--gold)}
 .totrow td,.totrow:hover td{font-weight:900;background:var(--ink);color:#e7c987;border-bottom:none}
 
 /* ---------- Tag groups ---------- */
@@ -457,11 +462,18 @@ function parseHousekeeping(wb){
   return {map,count,cols:used,diag};
 }
 function thirdBedNote(type,cfg){
-  if(!/tripl/i.test(String(type||''))) return '';
-  const c=String(cfg||'').toLowerCase(); if(!c) return '';
-  if(/castello/.test(c)) return '';
-  const three=/\b3\b/.test(c)||/tripl/.test(c)||(/matrimonial/.test(c)&&/singol/.test(c))||/aggiunt|terzo/.test(c);
-  return three?'':'togliere il terzo letto';
+  const t=String(type||'').toLowerCase(), c=String(cfg||'').toLowerCase();
+  if(!c) return '';
+  if(/tripl/.test(t)){
+    if(/castello/.test(c)) return '';
+    const three=/\b3\b/.test(c)||/tripl/.test(c)||(/matrimonial/.test(c)&&/singol/.test(c))||/aggiunt|terzo/.test(c);
+    return three?'':'togliere il terzo letto';
+  }
+  if(/quadrupl/.test(t)){
+    const full=/castello/.test(c)||/\b4\b/.test(c)||(/matrimonial/.test(c)&&/singol/.test(c));
+    return full?'':'Quadrupla: togliere i letti a castello in eccesso';
+  }
+  return '';
 }
 function bedDetail(e){
   if(!e)return'';
@@ -525,28 +537,27 @@ function computeHK(){
     const who=(gName(arr)+' '+gName(dep)).trim();
     const skey=(rn+' '+who).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
     let it=null;
+    const tbn=arr?thirdBedNote(room?room.type:(arr.tipo||''),hkNote||arr.bp.config):'';
+    const action = !!arr && (arr.f.twin || !!tbn || /castello|aggiunt/i.test(hkNote));
     if(arr && arr.stayOn && arr.stayOn.same){
       it={kind:'fermata',label:'FERMATA · non liberare',detail:`Si ferma: ${arr.stayOn.who} — rifresco, lascia i letti`};
     } else if(arr && arr.stayOn && !arr.stayOn.same){
       it={kind:'cambio',label:`CAMBIO CAMERA · arriva da ${arr.stayOn.from}`,detail:`${cfg} — ${arr.stayOn.who}`};
+    } else if(out){
+      // CHECK-OUT EFFETTUATO -> stanza PARTITA (libera ora)
+      it={kind:'vialibera',label: arr?'PARTITI · rifare per arrivo':'PARTITI · rifare stanza',detail: arr?cfg:(hkNote||'Pulizia, nessun nuovo arrivo')};
     } else if(arr){
-      const tbn=thirdBedNote(room?room.type:(arr.tipo||''),hkNote||arr.bp.config);
-      const action = arr.f.twin || !!tbn || /castello|aggiunt/i.test(hkNote);
-      if(action){
-        it={kind:'azione',label:'AZIONE LETTO'+(dep&&!out?' · partenza in giornata':''),detail:cfg};
-      } else {
-        let lbl = dep ? (out?'PARTITI · rifare per arrivo':'Rifare per arrivo · partenza in giornata') : 'Arrivo · preparare letti';
-        it={kind:'vialibera',label:lbl,detail:cfg};
-      }
+      // arrivo ma check-out non ancora effettuato -> da preparare (non ancora libera)
+      it={kind:'arrivo',label: dep?'Da preparare · partenza in giornata':'Arrivo · preparare letti',detail:cfg};
     } else if(dep){
-      it={kind:'vialibera',label: out?'PARTITI · rifare stanza':'In partenza · poi rifare stanza',detail:hkNote||'Pulizia, nessun nuovo arrivo'};
+      it={kind:'partenza',label:'In partenza · check-out da fare',detail:hkNote||'Poi pulizia, nessun nuovo arrivo'};
     }
-    if(it){ it.rn=rn; it.type=type; it.room=room; it.search=skey; it.isNew=(arr&&arr.isNew)||(dep&&dep.isNew); items.push(it); }
+    if(it){ it.rn=rn; it.type=type; it.room=room; it.search=skey; it.action=action; it.partita=!!out; it.isNew=(arr&&arr.isNew)||(dep&&dep.isNew); items.push(it); }
   });
   items.sort((a,b)=>(parseInt(a.rn)||9999)-(parseInt(b.rn)||9999));
   return items;
 }
-const HK_EMOJI={vialibera:'🟢',fermata:'🛑',cambio:'🔁',azione:'🛏'};
+const HK_EMOJI={vialibera:'🟢',arrivo:'🟡',partenza:'⚪',fermata:'🛑',cambio:'🔁',azione:'🛏'};
 function expStamp(){ return (((DATA.exportInfo||'').match(/(\d{1,2}[:.]\d{2})/)||[,''])[1]) || new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}); }
 function buildWaBeds(){
   const items=computeHK();
@@ -769,20 +780,23 @@ function rArrTag(){
 /* ---- Arrivi letti / housekeeping ---- */
 function rArrBed(){
   const items=computeHK();
-  const c={vialibera:0,fermata:0,cambio:0,azione:0}; items.forEach(i=>c[i.kind]++);
-  const cls={vialibera:'collected',fermata:'topay',cambio:'',azione:''};
-  const chip={vialibera:'ok',fermata:'crit',cambio:'warn',azione:'warn'};
-  const F=[['all','Tutti',items.length],['vialibera','🟢 Partiti',c.vialibera],['fermata','🛑 Fermate',c.fermata],['cambio','🔁 Cambi camera',c.cambio],['azione','🛏 Azioni letto',c.azione]];
+  const c={vialibera:0,arrivo:0,partenza:0,fermata:0,cambio:0}; items.forEach(i=>c[i.kind]++);
+  const cAction=items.filter(i=>i.action).length;
+  const cls={vialibera:'partiti',arrivo:'arrivo',partenza:'',fermata:'topay',cambio:'cambio'};
+  const chip={vialibera:'ok',arrivo:'warn',partenza:'muted',fermata:'crit',cambio:'warn'};
+  const F=[['all','Tutti',items.length],['vialibera','🟢 Partiti',c.vialibera],['arrivo','🟡 Da preparare',c.arrivo],['fermata','🛑 Fermate',c.fermata],['cambio','🔁 Cambi camera',c.cambio],['azione','🛏 Azioni letto',cAction]];
   const filterBar=`<div class="hk-filter no-print">${F.map(([k,lbl,n])=>`<button class="hkf ${HKFILTER===k?'active':''}" onclick="setHkFilter('${k}')">${lbl} <b>${n}</b></button>`).join('')}</div>`;
-  const shown=HKFILTER==='all'?items:items.filter(e=>e.kind===HKFILTER);
-  const rows=shown.map(e=>`<tr class="${cls[e.kind]}" data-search="${esc(e.search)}"><td class="rn">${esc(e.rn)}${newBadge(e)}</td><td>${esc(e.type)}</td><td><span class="chip ${chip[e.kind]}">${HK_EMOJI[e.kind]} ${esc(e.label)}</span></td><td>${esc(e.detail)}</td></tr>`).join('');
+  const shown = HKFILTER==='all' ? items
+              : HKFILTER==='azione' ? items.filter(e=>e.action)
+              : items.filter(e=>e.kind===HKFILTER);
+  const rows=shown.map(e=>`<tr class="${cls[e.kind]||''}" data-search="${esc(e.search)}"><td class="rn">${esc(e.rn)}${newBadge(e)}</td><td>${esc(e.type)}</td><td><span class="chip ${chip[e.kind]||''}">${HK_EMOJI[e.kind]} ${esc(e.label)}</span>${e.action?' <span class="chip warn">🛏 azione letto</span>':''}</td><td>${esc(e.detail)}</td></tr>`).join('');
   const table=!items.length
     ? `<div class="empty-state">Nessuna stanza da segnalare al housekeeping al momento.</div>`
     : (!shown.length
       ? `<div class="empty-state">Nessuna stanza in questa categoria.</div>`
       : `<table><thead><tr><th>Stanza</th><th>Tipo</th><th>Stato housekeeping</th><th>Dettaglio / letti</th></tr></thead><tbody>${rows}</tbody></table>`);
   return `<section class="report" data-r="arr-bed">
-    <div class="report-head"><div><h2>Arrivi · letti (housekeeping)</h2><div class="lead">Aggiornato alle ore ${esc(expStamp())} · 🟢 Partiti ${c.vialibera} · 🛑 Fermate ${c.fermata} · 🔁 Cambi camera ${c.cambio} · 🛏 Azioni letto ${c.azione}</div></div></div>
+    <div class="report-head"><div><h2>Arrivi · letti (housekeeping)</h2><div class="lead">Aggiornato alle ore ${esc(expStamp())} · 🟢 Partiti (check-out fatto) ${c.vialibera} · 🟡 Da preparare ${c.arrivo} · 🛑 Fermate ${c.fermata} · 🔁 Cambi camera ${c.cambio} · 🛏 Azioni letto ${cAction}</div></div></div>
     ${filterBar}
     <div class="wa-bar no-print">
       <button class="btn solid" onclick="waSendBeds()">📲 Invia su WhatsApp</button>
