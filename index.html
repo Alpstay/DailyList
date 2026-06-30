@@ -585,7 +585,7 @@ function waSendBeds(){ window.open('https://web.whatsapp.com/send?text='+encodeU
 function copyBeds(){ copyText(buildWaBeds(),document.getElementById('waMsg')); }
 
 /* =================== STATO APP =================== */
-let DATA=null, ENR=null, ACTIVE='dash', LASTSIG=null, HKPREP={}, HKFILTER='all';
+let DATA=null, ENR=null, ACTIVE='dash', LASTSIG=null, HKPREP={}, HKFILTER='all', AZSORT='name';
 const TABS=[
   {id:'dash',label:'Riepilogo',icon:'📊'},
   {id:'arr-room',label:'Arrivi',icon:'🛎'},
@@ -738,17 +738,22 @@ function roomCard(e){
 
 /* ---- Arrivi in ordine alfabetico del prenotante ---- */
 function rArrAz(){
-  const list=ENR.arrivi.slice().sort((a,b)=>(a.prenotante||'').localeCompare(b.prenotante||'','it',{sensitivity:'base'})||roomSort(a.alloggio,b.alloggio));
+  const byName=(a,b)=>(a.prenotante||'').localeCompare(b.prenotante||'','it',{sensitivity:'base'})||roomSort(a.alloggio,b.alloggio);
+  const byRoom=(a,b)=>roomSort(a.alloggio,b.alloggio)||(a.prenotante||'').localeCompare(b.prenotante||'','it',{sensitivity:'base'});
+  const list=ENR.arrivi.slice().sort(AZSORT==='room'?byRoom:byName);
   const rows=list.map(e=>{
     const chips=buildChips(e).filter(c=>c.lvl!=='ok').map(chipHtml).join(' ')||'<span style="color:var(--muted2)">—</span>';
     const guest=e.ospite&&e.ospite!=='-'?e.ospite:'';
     return `<tr data-search="${esc(searchKey(e))}"><td><b>${esc(e.prenotante)}</b>${newBadge(e)}</td><td>${esc(guest)}</td><td class="rn">${esc(e.rn)}</td><td>${esc(e.room?e.room.type:e.tipo)}</td><td class="num">${e.pax}</td><td>${esc(bedDetail(e))}</td><td>${chips}</td></tr>`;
   }).join('');
+  const sortBar=`<div class="hk-filter no-print"><button class="hkf ${AZSORT==='name'?'active':''}" onclick="setAzSort('name')">🔤 Nome (A→Z)</button><button class="hkf ${AZSORT==='room'?'active':''}" onclick="setAzSort('room')">🔢 Numero stanza</button></div>`;
   return `<section class="report" data-r="arr-az">
-    <div class="report-head"><div><h2>Arrivi · ordine alfabetico</h2><div class="lead">Per prenotante (A→Z) · per ritrovare subito chi si presenta al banco</div></div></div>
+    <div class="report-head"><div><h2>Arrivi · ${AZSORT==='room'?'ordine stanza':'ordine alfabetico'}</h2><div class="lead">${AZSORT==='room'?'Per numero di stanza (crescente)':'Per prenotante (A→Z) · per ritrovare subito chi si presenta al banco'}</div></div></div>
+    ${sortBar}
     ${list.length?`<table><thead><tr><th>Prenotante</th><th>Ospite</th><th>Stanza</th><th>Tipo</th><th>Pax</th><th>Letti</th><th>Attenzioni</th></tr></thead><tbody>${rows}</tbody></table>`:'<div class="empty-state">Nessun arrivo.</div>'}
   </section>`;
 }
+window.setAzSort=function(k){ AZSORT=k; renderReports(); applySearch(); };
 
 /* ---- Arrivi tag compattati ---- */
 function rArrTag(){
