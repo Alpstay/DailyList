@@ -109,6 +109,7 @@ main{max-width:1180px;margin:0 auto;padding:26px 22px 90px}
 .wa-bar{display:flex;gap:11px;align-items:center;flex-wrap:wrap;margin-bottom:20px}
 .wa-bar .btn{text-transform:none;letter-spacing:.02em}
 .wa-msg{font-size:12.5px;color:var(--green);font-weight:700}
+.wa-hint{font-size:11.5px;color:var(--muted);font-style:italic}
 .wa-prev{width:100%;margin-top:2px}
 .wa-prev summary{font-size:11px;color:var(--muted);cursor:pointer;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
 .wa-prev pre{white-space:pre-wrap;font-family:var(--body);font-size:12.5px;color:var(--ink-2);background:var(--wash);border:1px solid var(--line);border-radius:3px;padding:13px 15px;margin-top:9px;line-height:1.5}
@@ -560,15 +561,20 @@ function computeHK(){
 const HK_EMOJI={vialibera:'🟢',arrivo:'🟡',partenza:'⚪',fermata:'🛑',cambio:'🔁',azione:'🛏'};
 function expStamp(){ return (((DATA.exportInfo||'').match(/(\d{1,2}[:.]\d{2})/)||[,''])[1]) || new Date().toLocaleTimeString('it-IT',{hour:'2-digit',minute:'2-digit'}); }
 function buildWaBeds(){
-  const items=computeHK();
+  const all=computeHK();
   const date=((DATA.exportInfo||'').match(/(\d{1,2}\s+[a-zàèéìòù]+\s+\d{4})/i)||[,''])[1];
   const time=expStamp();
-  const c={vialibera:0,fermata:0,cambio:0,azione:0}; items.forEach(i=>c[i.kind]++);
+  const FL={all:'Tutte',vialibera:'Partiti (check-out fatto)',arrivo:'Da preparare',fermata:'Fermate',cambio:'Cambi camera',azione:'Azioni letto'};
+  const shown = HKFILTER==='all' ? all
+              : HKFILTER==='azione' ? all.filter(e=>e.action)
+              : all.filter(e=>e.kind===HKFILTER);
+  const c={vialibera:0,arrivo:0,fermata:0,cambio:0,partenza:0}; all.forEach(i=>c[i.kind]++); const cAction=all.filter(i=>i.action).length;
   const L=['*ALPSTAY · SASLONG*','🛏 *LETTI – HOUSEKEEPING*'+(date?' '+date:'')+'  ·  aggiornata alle ore '+time,''];
-  L.push(`🟢 Partiti: ${c.vialibera}  ·  🛑 Fermate: ${c.fermata}  ·  🔁 Cambi: ${c.cambio}  ·  🛏 Azioni: ${c.azione}`);
-  if(!items.length){ L.push(''); L.push('Nessuna stanza da segnalare.'); return L.join('\n'); }
+  if(HKFILTER!=='all'){ L.push('Filtro: *'+FL[HKFILTER]+'*  ·  '+shown.length+' stanze'); }
+  else { L.push(`🟢 Partiti: ${c.vialibera}  ·  🟡 Da preparare: ${c.arrivo}  ·  🛑 Fermate: ${c.fermata}  ·  🔁 Cambi: ${c.cambio}  ·  🛏 Azioni: ${cAction}`); }
+  if(!shown.length){ L.push(''); L.push('Nessuna stanza in questa categoria.'); return L.join('\n'); }
   const byFloor={};
-  items.forEach(e=>{const f=e.room?e.room.floor:'Altre stanze';(byFloor[f]=byFloor[f]||[]).push(e);});
+  shown.forEach(e=>{const f=e.room?e.room.floor:'Altre stanze';(byFloor[f]=byFloor[f]||[]).push(e);});
   Object.keys(byFloor).forEach(f=>{
     L.push(''); L.push(`*${f.toUpperCase()}*`);
     byFloor[f].forEach(e=>L.push(`${e.isNew?'🆕 ':''}${HK_EMOJI[e.kind]} ${e.rn} ${e.type} — ${e.label}${e.detail?': '+e.detail:''}`));
@@ -804,9 +810,10 @@ function rArrBed(){
     <div class="report-head"><div><h2>Arrivi · letti (housekeeping)</h2><div class="lead">Aggiornato alle ore ${esc(expStamp())} · 🟢 Partiti (check-out fatto) ${c.vialibera} · 🟡 Da preparare ${c.arrivo} · 🛑 Fermate ${c.fermata} · 🔁 Cambi camera ${c.cambio} · 🛏 Azioni letto ${cAction}</div></div></div>
     ${filterBar}
     <div class="wa-bar no-print">
-      <button class="btn solid" onclick="waSendBeds()">📲 Invia su WhatsApp</button>
-      <button class="btn" onclick="copyBeds()">Copia lista</button>
+      <button class="btn solid" onclick="waSendBeds()">📲 Invia su WhatsApp${HKFILTER!=='all'?' · '+(F.find(x=>x[0]===HKFILTER)||[,''])[1]+' ('+shown.length+')':' · lista completa'}</button>
+      <button class="btn" onclick="copyBeds()">Copia lista${HKFILTER!=='all'?' filtrata':''}</button>
       <span class="wa-msg" id="waMsg"></span>
+      <span class="wa-hint">${HKFILTER!=='all'?'Invia SOLO le stanze del filtro selezionato':'Seleziona un filtro qui sopra per inviare solo quelle stanze'}</span>
       <details class="wa-prev"><summary>Anteprima testo</summary><pre>${esc(buildWaBeds())}</pre></details>
     </div>
     ${table}
