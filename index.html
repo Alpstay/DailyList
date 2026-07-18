@@ -110,6 +110,19 @@ main{max-width:1180px;margin:0 auto;padding:26px 22px 90px}
 .wa-bar .btn{text-transform:none;letter-spacing:.02em}
 .wa-msg{font-size:12.5px;color:var(--green);font-weight:700}
 .wa-hint{font-size:11.5px;color:var(--muted);font-style:italic}
+.linen-grid{display:grid;grid-template-columns:300px 1fr;gap:22px;align-items:start}
+.linen-cart{background:var(--gold-soft);border:1px solid var(--gold-line);border-radius:8px;padding:18px 20px;position:sticky;top:12px}
+.linen-cart h3,.linen-detail h3{font-family:var(--title);font-size:18px;font-weight:400;color:var(--ink);margin:0 0 12px;letter-spacing:.02em}
+.cart-table td{padding:9px 4px;border-bottom:1px solid var(--gold-line)}
+.cart-table tr:last-child td{border-bottom:none}
+.cart-table .num{font-size:17px;color:var(--gold-deep)}
+@media(max-width:820px){ .linen-grid{grid-template-columns:1fr} .linen-cart{position:static} }
+.lin-inp{width:52px;padding:4px 6px;border:1px solid var(--gold);border-radius:5px;font-family:var(--body);font-size:13px;text-align:center;background:#fffdf8}
+.lin-inp:focus{outline:none;box-shadow:0 0 0 3px var(--gold-soft)}
+.lin-act{white-space:nowrap;text-align:center}
+.lin-btn{appearance:none;border:1px solid var(--line-2);background:#fff;border-radius:6px;padding:3px 8px;cursor:pointer;font-size:13px;line-height:1;margin:0 1px}
+.lin-btn:hover{border-color:var(--gold);background:var(--gold-soft)}
+.lin-btn.ok{border-color:var(--green);color:var(--green);font-weight:800}
 .wa-prev{width:100%;margin-top:2px}
 .wa-prev summary{font-size:11px;color:var(--muted);cursor:pointer;font-weight:700;text-transform:uppercase;letter-spacing:.08em}
 .wa-prev pre{white-space:pre-wrap;font-family:var(--body);font-size:12.5px;color:var(--ink-2);background:var(--wash);border:1px solid var(--line);border-radius:3px;padding:13px 15px;margin-top:9px;line-height:1.5}
@@ -590,8 +603,129 @@ function copyText(t,msgEl){
 function waSendBeds(){ window.open('https://web.whatsapp.com/send?text='+encodeURIComponent(buildWaBeds()),'_blank'); }
 function copyBeds(){ copyText(buildWaBeds(),document.getElementById('waMsg')); }
 
+/* =================== BIANCHERIA =================== */
+// Regole: lenzuola per LETTO (matrimoniale=1 doppio, singolo=1 per letto, castello=2 letti);
+// federe/copriletti/asciugamani/teli = per POSTO letto; 1 tappetino bagno per stanza.
+function linenFor(cfgStr,roomType){
+  const c=String(cfgStr||'').toLowerCase(); let matr=0,sing=0,m;
+  const R=(re,mult)=>{ re.lastIndex=0; while(m=re.exec(c)){ const n=m[1]?parseInt(m[1]):1; if(mult==='m')matr+=n; else if(mult==='cast')sing+=n*2; else sing+=n; } };
+  R(/(\d+)?\s*matrimonial/g,'m');
+  R(/(\d+)?\s*singol/g,'s');
+  R(/(\d+)?\s*(?:a\s*)?castell/g,'cast');
+  R(/(\d+)?\s*lett[oi]?\s*aggiunt/g,'s');
+  if(matr===0&&sing===0){ // fallback dal tipo stanza
+    if(/quadrupl/i.test(roomType))sing=4; else if(/tripl/i.test(roomType)){matr=1;sing=1;} else {matr=1;}
+  }
+  const posti=matr*2+sing;
+  return {lenzMatr:matr,lenzSing:sing,federe:posti,copriletti:posti,asciugamani:posti,teli:posti,tappetino:1,posti};
+}
+function standardConfig(type){
+  const t=String(type||'').toLowerCase();
+  if(/quadrupl/.test(t)) return '4 singoli';                 // quadrupla standard = 4 letti singoli
+  if(/tripl/.test(t)) return '1 matrimoniale 1 singolo';     // tripla standard = matrimoniale + letto aggiunto
+  return '1 matrimoniale';                                    // doppia/matrimoniale standard
+}
+function computeLinen(){
+  if(!ENR)return {rooms:[],totals:{},free:[]};
+  const rooms=[];
+  ENR.arrivi.forEach(a=>{
+    if(a.stayOn&&a.stayOn.same)return;               // resta nella stessa stanza: nessun nuovo allestimento completo
+    const rn=a.rn||roomNum(a.alloggio); if(!rn)return;
+    const cfg=HKPREP[rn]||a.bp.config;
+    const type=a.room?a.room.type:(a.tipo||'');
+    rooms.push({rn,cfg,type,ospite:a.prenotante||'',edited:!!LINEN_OVERRIDES[rn],linen:{...linenFor(cfg,type),...(LINEN_OVERRIDES[rn]||{})}});
+  });
+  rooms.sort((x,y)=>(parseInt(x.rn)||9999)-(parseInt(y.rn)||9999));
+  // stanze che restano LIBERE: partenza senza nuovo arrivo e senza chi resta -> apparecchiatura STANDARD
+  const arrRooms=new Set(rooms.map(r=>r.rn));
+  const stayRooms=new Set(ENR.arrivi.filter(a=>a.stayOn&&a.stayOn.same).map(a=>a.rn||roomNum(a.alloggio)));
+  const freeMap={};
+  ENR.partenze.forEach(p=>{
+    const rn=p.rn||roomNum(p.alloggio); if(!rn)return;
+    if(arrRooms.has(rn)||stayRooms.has(rn))return;
+    if(!freeMap[rn]) freeMap[rn]={rn,type:p.room?p.room.type:(p.tipo||''),out:/check-?out/i.test(p.stato)};
+  });
+  const free=Object.values(freeMap).map(fr=>{ const cfg=standardConfig(fr.type); return {...fr,cfg,standard:true,edited:!!LINEN_OVERRIDES[fr.rn],linen:{...linenFor(cfg,fr.type),...(LINEN_OVERRIDES[fr.rn]||{})}}; })
+                                    .sort((x,y)=>(parseInt(x.rn)||9999)-(parseInt(y.rn)||9999));
+  const totals={lenzMatr:0,lenzSing:0,federe:0,copriletti:0,asciugamani:0,teli:0,tappetino:0,posti:0};
+  [...rooms,...free].forEach(r=>{ for(const k in totals) totals[k]+=r.linen[k]; });
+  return {rooms,totals,free};
+}
+const LINEN_ROWS=[['lenzMatr','Lenzuola matrimoniali'],['lenzSing','Lenzuola singole'],['federe','Copricuscini (federe)'],['copriletti','Copriletti'],['tappetino','Tappetini bagno'],['asciugamani','Asciugamani'],['teli','Teli da bagno']];
+const LF=['lenzMatr','lenzSing','federe','copriletti','tappetino','asciugamani','teli'];
+function linenCells(r){
+  if(LINEN_EDIT===r.rn){
+    return LF.map(k=>`<td class="num"><input type="number" min="0" class="lin-inp" id="lin_${r.rn}_${k}" value="${r.linen[k]||0}"></td>`).join('')
+      +`<td class="lin-act"><button class="lin-btn ok" title="Salva" onclick="linenSave('${r.rn}')">✓</button><button class="lin-btn" title="Annulla" onclick="linenCancel()">✕</button></td>`;
+  }
+  const cell=k=>`<td class="num">${(k==='lenzMatr'||k==='lenzSing')?(r.linen[k]||''):r.linen[k]}</td>`;
+  return LF.map(cell).join('')
+    +`<td class="lin-act"><button class="lin-btn" title="Modifica quantità" onclick="linenEdit('${r.rn}')">✏️</button>${r.edited?`<button class="lin-btn" title="Ripristina standard" onclick="linenReset('${r.rn}')">↺</button>`:''}</td>`;
+}
+function linenEdit(rn){ LINEN_EDIT=rn; renderReports(); const el=document.getElementById('lin_'+rn+'_federe'); if(el){el.focus();el.select();} }
+function linenCancel(){ LINEN_EDIT=null; renderReports(); }
+function linenSave(rn){
+  const o={}; LF.forEach(k=>{ const el=document.getElementById('lin_'+rn+'_'+k); if(el){ const v=parseInt(el.value); o[k]=isNaN(v)||v<0?0:v; } });
+  LINEN_OVERRIDES[rn]=o; LINEN_EDIT=null; renderReports();
+  if(DATA){ DATA.hkprep=HKPREP; } // niente cloud per gli override, restano locali
+  const m=document.getElementById('linenMsg'); if(m){m.textContent='Stanza '+rn+' aggiornata ✓';setTimeout(()=>m.textContent='',3000);}
+}
+function linenReset(rn){ delete LINEN_OVERRIDES[rn]; LINEN_EDIT=null; renderReports(); }
+function rBiancheria(){
+  const {rooms,totals,free}=computeLinen();
+  const cartRows=LINEN_ROWS.map(([k,lbl])=>`<tr><td>${lbl}</td><td class="num"><b>${totals[k]||0}</b></td></tr>`).join('');
+  const row=r=>`<tr data-search="${esc((r.rn+' '+(r.ospite||'')).toLowerCase())}"><td class="rn">${esc(r.rn)}</td><td>${esc(r.type)}</td><td>${esc(r.cfg)}${r.standard?' <span class="chip muted">standard</span>':''}${r.edited?' <span class="chip warn">✎ modificata</span>':''}</td>${linenCells(r)}</tr>`;
+  const detail=rooms.map(row).join('');
+  const freeRows=free.map(row).join('');
+  const thead=`<thead><tr><th>Stanza</th><th>Tipo</th><th>Config. letti</th><th>Matr.</th><th>Sing.</th><th>Federe</th><th>Copril.</th><th>Tappet.</th><th>Asciug.</th><th>Teli</th><th></th></tr></thead>`;
+  return `<section class="report" data-r="biancheria">
+    <div class="report-head"><div><h2>Biancheria · carrello del giorno</h2><div class="lead">${rooms.length} stanze in arrivo${free.length?` + ${free.length} che restano libere (apparecchiate standard)`:''} · ${totals.posti||0} posti letto totali · ✏️ modificabile stanza per stanza</div></div></div>
+    <div class="wa-bar no-print">
+      <button class="btn solid" onclick="waSendLinen()">📲 Invia su WhatsApp</button>
+      <button class="btn" onclick="copyLinen()">Copia elenco</button>
+      <button class="btn" onclick="window.print()">Stampa</button>
+      <span class="wa-msg" id="linenMsg"></span>
+      <details class="wa-prev"><summary>Anteprima testo</summary><pre>${esc(buildWaLinen())}</pre></details>
+    </div>
+    ${(rooms.length||free.length)?`
+    <div class="linen-grid">
+      <div class="linen-cart">
+        <h3>🧺 Carrello — totale da preparare</h3>
+        <table class="cart-table"><tbody>${cartRows}</tbody></table>
+      </div>
+      <div class="linen-detail">
+        <h3>Dettaglio per stanza (in arrivo)</h3>
+        ${rooms.length?`<table>${thead}<tbody>${detail}</tbody></table>`:'<div class="empty-state">Nessun arrivo.</div>'}
+      </div>
+    </div>`:'<div class="empty-state">Nessuna stanza da preparare.</div>'}
+    ${free.length?`
+    <h3 style="font-family:var(--title);font-weight:400;font-size:18px;margin:26px 0 10px">🚪 Stanze che restano libere <span style="font-size:13px;color:var(--muted)">— apparecchiate standard (biancheria inclusa nel carrello)</span></h3>
+    <table>${thead}<tbody>${freeRows}</tbody></table>`:''}
+  </section>`;
+}
+function buildWaLinen(){
+  const {rooms,totals,free}=computeLinen();
+  const date=((DATA.exportInfo||'').match(/(\d{1,2}\s+[a-zàèéìòù]+\s+\d{4})/i)||[,''])[1];
+  const L=['*ALPSTAY · SASLONG*','🧺 *BIANCHERIA – CARRELLO*'+(date?' '+date:''),''];
+  if(!rooms.length && !free.length){ L.push('Nessun arrivo da allestire.'); return L.join('\n'); }
+  L.push(`Stanze da allestire: ${rooms.length}  ·  Posti letto: ${totals.posti||0}`); L.push('');
+  if(rooms.length){
+    L.push('*TOTALE CARRELLO*');
+    LINEN_ROWS.forEach(([k,lbl])=>{ if(totals[k]) L.push(`• ${lbl}: ${totals[k]}`); });
+    L.push(''); L.push('*DETTAGLIO STANZE (in arrivo)*');
+    rooms.forEach(r=>{ const p=[]; if(r.linen.lenzMatr)p.push(r.linen.lenzMatr+' matr.'); if(r.linen.lenzSing)p.push(r.linen.lenzSing+' sing.'); L.push(`${r.rn} ${r.type} — lenzuola ${p.join(' + ')||'-'}; federe ${r.linen.federe}, copriletti ${r.linen.copriletti}, tappetino ${r.linen.tappetino}, asciug. ${r.linen.asciugamani}, teli ${r.linen.teli}`); });
+  }
+  if(free.length){
+    L.push(''); L.push('*STANZE CHE RESTANO LIBERE* (apparecchiate standard)');
+    free.forEach(r=>{ const p=[]; if(r.linen.lenzMatr)p.push(r.linen.lenzMatr+' matr.'); if(r.linen.lenzSing)p.push(r.linen.lenzSing+' sing.'); L.push(`${r.rn} ${r.type} — lenzuola ${p.join(' + ')||'-'}; federe ${r.linen.federe}, copriletti ${r.linen.copriletti}, tappetino ${r.linen.tappetino}, asciug. ${r.linen.asciugamani}, teli ${r.linen.teli}`); });
+  }
+  return L.join('\n');
+}
+function waSendLinen(){ window.open('https://web.whatsapp.com/send?text='+encodeURIComponent(buildWaLinen()),'_blank'); }
+function copyLinen(){ copyText(buildWaLinen(),document.getElementById('linenMsg')); }
+
 /* =================== STATO APP =================== */
-let DATA=null, ENR=null, ACTIVE='dash', LASTSIG=null, HKPREP={}, HKFILTER='all', AZSORT='name';
+let DATA=null, ENR=null, ACTIVE='dash', LASTSIG=null, HKPREP={}, HKFILTER='all', AZSORT='name', LINEN_OVERRIDES={}, LINEN_EDIT=null;
 const TABS=[
   {id:'dash',label:'Riepilogo',icon:'📊'},
   {id:'arr-room',label:'Arrivi',icon:'🛎'},
@@ -601,6 +735,7 @@ const TABS=[
   {id:'dep-room',label:'Partenze',icon:'🚪'},
   {id:'dep-extra',label:'Extra',icon:'🧾'},
   {id:'stay',label:'Soggiorno',icon:'🛌'},
+  {id:'biancheria',label:'Biancheria',icon:'🧺'},
 ];
 
 /* =================== RENDER =================== */
@@ -611,6 +746,7 @@ function tabCount(id){
   if(id==='dep-extra')return ENR.depExtras.length;
   if(id.startsWith('dep'))return ENR.partenze.length;
   if(id==='stay')return ENR.soggiorno.length;
+  if(id==='biancheria')return computeLinen().rooms.length;
   return '';
 }
 function renderTabs(){
@@ -652,7 +788,7 @@ function sum(arr,fn){return arr.reduce((s,x)=>s+fn(x),0);}
 function renderReports(){
   const wrap=document.getElementById('reports');
   if(!ENR){wrap.innerHTML='';return;}
-  wrap.innerHTML=[rDash(),rArrRoom(),rArrAz(),rArrTag(),rArrBed(),rDepExtra(),rDepRoom(),rStay()].join('');
+  wrap.innerHTML=[rDash(),rArrRoom(),rArrAz(),rArrTag(),rArrBed(),rDepExtra(),rDepRoom(),rStay(),rBiancheria()].join('');
   document.querySelectorAll('.report').forEach(r=>r.classList.toggle('active',r.dataset.r===ACTIVE));
 }
 
@@ -925,7 +1061,7 @@ function process(data,keepView,fromCloud){
   document.getElementById('reloadBtn').style.display='inline-flex';
   document.getElementById('updateBtn').style.display='inline-flex';
   document.getElementById('hkBtn').style.display='inline-flex';
-  if(!keepView){ ACTIVE='dash'; SEARCH=''; HKFILTER='all'; const sb=document.getElementById('searchBox'); if(sb)sb.value=''; }
+  if(!keepView){ ACTIVE='dash'; SEARCH=''; HKFILTER='all'; LINEN_OVERRIDES={}; LINEN_EDIT=null; const sb=document.getElementById('searchBox'); if(sb)sb.value=''; }
   renderTabs();renderReports();applySearch();
   if(keepView){
     const um=document.getElementById('updMsg');
@@ -1013,7 +1149,7 @@ document.getElementById('updateBtn').onclick=()=>updateInput.click();
 updateInput.onchange=e=>{ if(e.target.files[0])routeFile(e.target.files[0],true); updateInput.value=''; };
 document.getElementById('hkBtn').onclick=()=>hkInput.click();
 function resetView(){
-  DATA=ENR=null; LASTSIG=null; SEARCH=''; HKPREP={}; HKFILTER='all';
+  DATA=ENR=null; LASTSIG=null; SEARCH=''; HKPREP={}; HKFILTER='all'; LINEN_OVERRIDES={}; LINEN_EDIT=null;
   const sb=document.getElementById('searchBox'); if(sb)sb.value='';
   document.getElementById('dropArea').style.display='block';
   document.getElementById('tabs').style.display='none';
