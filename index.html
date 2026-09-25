@@ -518,8 +518,8 @@ function seedCollab(){ return [
 ]; }
 let ROOMS_DB=LS.get('abo_rooms',null)||seedRooms();
 let COLLAB=LS.get('abo_collab',null)||seedCollab();
-const saveRooms=()=>LS.set('abo_rooms',ROOMS_DB);
-const saveCollab=()=>LS.set('abo_collab',COLLAB);
+const saveRooms=()=>{ LS.set('abo_rooms',ROOMS_DB); if(fdb){try{fdb.ref('console/rooms').set(ROOMS_DB);}catch(e){}} };
+const saveCollab=()=>{ LS.set('abo_collab',COLLAB); if(fdb){try{fdb.ref('console/collab').set(COLLAB);}catch(e){}} };
 let SETTINGS=LS.get('abo_settings',null)||{saslong:{prepCastle:'292',prepExtra:'103',dayNote:'Buongiorno ragazze! 🌸 Grazie per la cura che mettete in ogni stanza. Buona giornata!'},hartmann:{},acadia:{}};
 const saveSettings=()=>LS.set('abo_settings',SETTINGS);
 const getRoom=(prop,rn)=>(ROOMS_DB[prop]||[]).find(r=>r.rn===String(rn));
@@ -1006,10 +1006,18 @@ function workloadForecast(prop){
 }
 // --- Firebase: stato manutenzione condiviso tra i dispositivi ---
 // Inserire qui la config del progetto Firebase (Realtime Database). Se vuoto: modalità locale.
-const FIREBASE_CFG={ apiKey:'', authDomain:'', databaseURL:'', projectId:'' };
+const FIREBASE_CFG={ apiKey:'AIzaSyB6lFBRjf_9VwZUga6ERV85l2bJ8uQWHEc', authDomain:'dailylistsas.firebaseapp.com', databaseURL:'https://dailylistsas-default-rtdb.europe-west1.firebasedatabase.app', projectId:'dailylistsas' };
 const APP_URL='https://www.alpstaytest.eu'; // indirizzo del gestionale da inviare alle ragazze
 let fdb=null;
-function initFirebase(){ try{ if(!FIREBASE_CFG.databaseURL||typeof firebase==='undefined')return false; firebase.initializeApp(FIREBASE_CFG); fdb=firebase.database(); fdb.ref('maint').on('value',snap=>{ const v=snap.val()||{}; MAINT={saslong:v.saslong||{},hartmann:v.hartmann||{},acadia:v.acadia||{}}; if(SESSION.role)renderModule(); }); fdb.ref('staffloc').on('value',snap=>{ const v=snap.val()||{}; STAFF_LOC={saslong:v.saslong||{},hartmann:v.hartmann||{},acadia:v.acadia||{}}; if(SESSION.role)renderModule(); }); fdb.ref('roomoverride').on('value',snap=>{ const v=snap.val()||{}; ROOM_OVERRIDE={saslong:v.saslong||{},hartmann:v.hartmann||{},acadia:v.acadia||{}}; if(SESSION.role)renderModule(); }); return true; }catch(e){ fdb=null; return false; } }
+function initFirebase(){ try{ if(!FIREBASE_CFG.databaseURL||typeof firebase==='undefined')return false; firebase.initializeApp(FIREBASE_CFG); fdb=firebase.database(); fdb.ref('maint').on('value',snap=>{ const v=snap.val()||{}; MAINT={saslong:v.saslong||{},hartmann:v.hartmann||{},acadia:v.acadia||{}}; if(SESSION.role)renderModule(); }); fdb.ref('staffloc').on('value',snap=>{ const v=snap.val()||{}; STAFF_LOC={saslong:v.saslong||{},hartmann:v.hartmann||{},acadia:v.acadia||{}}; if(SESSION.role)renderModule(); }); fdb.ref('roomoverride').on('value',snap=>{ const v=snap.val()||{}; ROOM_OVERRIDE={saslong:v.saslong||{},hartmann:v.hartmann||{},acadia:v.acadia||{}}; if(SESSION.role)renderModule(); });
+  // Anagrafica stanze e collaboratori: condivise tra i dispositivi. Se il database è ancora vuoto su questi
+  // percorsi (primo collegamento), lo si "semina" con i dati locali attuali; da quel momento chi modifica da
+  // un dispositivo (es. Backoffice) aggiorna tutti gli altri.
+  fdb.ref('console/rooms').on('value',snap=>{ const v=snap.val(); if(v){ ROOMS_DB=v; if(SESSION.role)renderModule(); } });
+  fdb.ref('console/collab').on('value',snap=>{ const v=snap.val(); if(v){ COLLAB=v; if(SESSION.role)renderModule(); } });
+  fdb.ref('rooms').once('value').then(snap=>{ if(!snap.val()) fdb.ref('console/rooms').set(ROOMS_DB); }).catch(()=>{});
+  fdb.ref('collab').once('value').then(snap=>{ if(!snap.val()) fdb.ref('console/collab').set(COLLAB); }).catch(()=>{});
+  return true; }catch(e){ fdb=null; return false; } }
 function maintPush(prop,rn,obj){ (MAINT[prop]=MAINT[prop]||{})[rn]=obj; if(fdb){try{fdb.ref('maint/'+prop+'/'+rn).set(obj);}catch(e){}} }
 function maintRemove(prop,rn){ if(MAINT[prop])delete MAINT[prop][rn]; if(fdb){try{fdb.ref('maint/'+prop+'/'+rn).remove();}catch(e){}} }
 function fixLink(prop,rn){ return location.origin+location.pathname+'?fix='+encodeURIComponent(prop+'|'+rn); }
