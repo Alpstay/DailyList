@@ -3381,6 +3381,8 @@ function scatolaMsgErrore(code,message){
     case 'fb_vuoto':            return 'Nessun dato nel database: l\'importazione dalla Scatola non ha ancora scritto nulla su "giornata".';
     case 'fb_non_pronto':       return 'Database non raggiungibile: controlla la connessione.';
     case 'fb_errore':           return 'Errore nella lettura dei dati dal database.';
+    case 'chiave_negata':       return 'Il database nega l\'accesso alla chiave: le regole aggiornate (percorso config) non sono ancora state pubblicate.';
+    case 'chiave_illeggibile':  return 'Chiave non leggibile dal database.';
     case 'chiave_mancante':     return 'Manca la chiave per leggere i dati: in Firebase il percorso config/chiaveScatola e\' vuoto.';
     case 'non_decifrabile':     return 'I dati non si aprono con la chiave presente: chiave sbagliata o file di un altro giorno.';
     case 'file_non_letto':       return 'File dei dati non trovato ('+FONTE_FILE.url+'): l\'importazione dalla Scatola non ha ancora scritto nulla.';
@@ -3442,7 +3444,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-10-21.2';
+const APP_VERSIONE='2026-10-21.3';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
@@ -3497,8 +3499,20 @@ async function scatolaCaricaDaFile(){
     scatolaBanner();
     return;
   }
+  let chiave=null;
   try{
-    const chiave=await scatolaChiave();
+    // Letta a parte dal resto: se il database NEGA l'accesso al percorso della
+    // chiave (regole non ancora pubblicate) non e' la stessa cosa di una
+    // chiave sbagliata, e dirlo male manda a cercare nel posto sbagliato.
+    chiave=await scatolaChiave();
+  }catch(e){
+    const negato=e&&(e.code==='PERMISSION_DENIED'||/permission/i.test(String(e.message||'')));
+    SCATOLA.stato='errore';
+    SCATOLA.err={code:negato?'chiave_negata':'chiave_illeggibile',
+                 message:String(e&&e.message||e)};
+    scatolaBanner(); return;
+  }
+  try{
     if(!chiave){
       SCATOLA.stato='errore';
       SCATOLA.err={code:'chiave_mancante',message:'config/chiaveScatola'};
