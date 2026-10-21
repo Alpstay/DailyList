@@ -106,6 +106,32 @@ button{font-family:inherit}
 .bo-scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
 /* su telefono la tabella non si schiaccia: scorre tutta insieme, le colonne restano leggibili */
 .bo-scroll .bo-table{min-width:720px}
+/* Il nome e' la colonna con cui si cerca la persona: non puo' ridursi a
+   "Dire", "Lui:", "Sof". Gli si da' una larghezza minima sua. */
+.bo-table .c-nome{min-width:265px;width:100%}
+.bo-table .c-nome .bo-inp{font-weight:600}
+.bo-table .c-pin{width:78px;font-family:var(--display);font-weight:700;letter-spacing:.06em}
+/* Sotto i 760px la tabella diventa una scheda per persona: nove colonne su un
+   telefono si schiacciano comunque, e si finisce a leggere tre lettere. */
+@media (max-width:760px){
+  .bo-scroll{overflow-x:visible}
+  .bo-scroll .bo-table{min-width:0;border:0;background:none}
+  .bo-table thead{display:none}
+  .bo-table,.bo-table tbody,.bo-table tr{display:block;width:100%}
+  .bo-table tr{border:1px solid var(--line);border-radius:12px;background:var(--paper);padding:7px 11px 9px;margin-bottom:10px;position:relative}
+  .bo-table td{display:flex;align-items:center;gap:10px;border:0;padding:4px 0;font-size:13.5px}
+  .bo-table td::before{content:attr(data-l);flex:0 0 96px;font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-family:var(--display)}
+  .bo-table td:not([data-l])::before{content:none}
+  .bo-table td .bo-inp,.bo-table td .bo-sel{flex:1 1 auto;width:100%;min-width:0;font-size:13.5px;padding:7px 9px}
+  .bo-table td.c-nome{padding-bottom:8px;margin-bottom:4px;border-bottom:1px solid var(--line2)}
+  .bo-table td.c-nome::before{display:none}
+  .bo-table td.c-nome .bo-inp{font-size:16px;font-weight:700;font-family:var(--display)}
+  .bo-table td .c-pin{flex:0 0 92px;width:92px}
+  .bo-table td.c-del{position:absolute;top:8px;right:9px;padding:0}
+  .bo-table .floor-chips{flex-wrap:wrap}
+  .bo-table .wa-cell{flex:1 1 auto;min-width:0}
+  .bo-table .wa-cell .bo-inp{width:100%!important}
+}
 .foot{margin-top:34px;color:var(--muted2);font-size:12px}
 .foot code{background:var(--line2);padding:1px 6px;border-radius:5px;font-size:11.5px;color:var(--slate)}
 
@@ -3517,7 +3543,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-10-21.11';
+const APP_VERSIONE='2026-10-21.13';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
@@ -4440,21 +4466,21 @@ function boCollab(){
   const langOpt=(sel)=>LANGS.map(([c])=>`<option value="${c}" ${(sel||'it')===c?'selected':''}>${LANG_NAMES[c]}</option>`).join('');
   const floorSel=(c,i)=>{ if(c.role!=='piani'||c.prop==='*') return '—'; const fl=floorsOf(c.prop); if(!fl.length) return '—'; const active=staffFloors(c); return `<div class="floor-chips">${fl.map(f=>`<button class="toggle sm ${active.includes(f)?'on':''}" onclick="boColToggleFloor(${i},'${f}')">${f}</button>`).join('')}</div>`; };
   const rows=COLLAB.map((c,i)=>`<tr>
-    <td><input class="bo-inp" value="${(c.name||'').replace(/"/g,'&quot;')}" onchange="boColSet(${i},'name',this.value)"></td>
-    <td><select class="bo-sel" onchange="boColSet(${i},'role',this.value)">${ROLES.map(([v,l])=>`<option value="${v}" ${c.role===v?'selected':''}>${t(v==='lavanderia'?'r_lav':'r_'+v)}</option>`).join('')}</select></td>
-    <td><select class="bo-sel" onchange="boColSet(${i},'prop',this.value)">${propOpt(c.prop)}</select></td>
-    <td>${floorSel(c,i)}</td>
-    <td><select class="bo-sel" onchange="boColSet(${i},'lang',this.value)">${langOpt(c.lang)}</select></td>
-    <td><input class="bo-inp" style="width:80px;font-family:var(--display);font-weight:700" value="${c.pin}" maxlength="6" onchange="boColSet(${i},'pin',this.value)"></td>
-    <td><div class="wa-cell"><input class="bo-inp" style="width:140px" value="${(c.phone||'').replace(/"/g,'&quot;')}" placeholder="+39 333 1234567" onchange="boColSet(${i},'phone',this.value)">${(c.phone||'').trim()?`<button class="wa-mini" title="${t('wa_direct')}" onclick="waCollab(${i})">💬</button>`:''}</div></td>
-    <td>${c.role==='piani'?`<select class="bo-sel" onchange="boColSet(${i},'rest',this.value)"><option value="">${t('rest_none')}</option>${WD_FULL.map((d,k)=>`<option value="${k}" ${restDay(c)===k?'selected':''}>${d}</option>`).join('')}</select>`:'—'}</td>
-    <td><button class="bo-del" onclick="boDelCol(${i})">🗑</button></td>
+    <td class="c-nome" data-l="${t('th_name')}"><input class="bo-inp" value="${(c.name||'').replace(/"/g,'&quot;')}" onchange="boColSet(${i},'name',this.value)"></td>
+    <td data-l="${t('th_dept')}"><select class="bo-sel" onchange="boColSet(${i},'role',this.value)">${ROLES.map(([v,l])=>`<option value="${v}" ${c.role===v?'selected':''}>${t(v==='lavanderia'?'r_lav':'r_'+v)}</option>`).join('')}</select></td>
+    <td data-l="${t('th_prop')}"><select class="bo-sel" onchange="boColSet(${i},'prop',this.value)">${propOpt(c.prop)}</select></td>
+    <td data-l="${t('th_floor')}">${floorSel(c,i)}</td>
+    <td data-l="${t('th_lang')}"><select class="bo-sel" onchange="boColSet(${i},'lang',this.value)">${langOpt(c.lang)}</select></td>
+    <td data-l="PIN"><input class="bo-inp c-pin" value="${c.pin}" maxlength="6" onchange="boColSet(${i},'pin',this.value)"></td>
+    <td data-l="WhatsApp"><div class="wa-cell"><input class="bo-inp" style="width:140px" value="${(c.phone||'').replace(/"/g,'&quot;')}" placeholder="+39 333 1234567" onchange="boColSet(${i},'phone',this.value)">${(c.phone||'').trim()?`<button class="wa-mini" title="${t('wa_direct')}" onclick="waCollab(${i})">💬</button>`:''}</div></td>
+    <td data-l="${t('rest_col')}">${c.role==='piani'?`<select class="bo-sel" onchange="boColSet(${i},'rest',this.value)"><option value="">${t('rest_none')}</option>${WD_FULL.map((d,k)=>`<option value="${k}" ${restDay(c)===k?'selected':''}>${d}</option>`).join('')}</select>`:'—'}</td>
+    <td class="c-del"><button class="bo-del" onclick="boDelCol(${i})">🗑</button></td>
   </tr>`).join('');
   const mRows=manutList(SESSION.prop).map((m,i)=>`<tr>
-    <td><input class="bo-inp" value="${(m.name||'').replace(/"/g,'&quot;')}" placeholder="${t('th_name')}" onchange="boManutSet(${i},'name',this.value)"></td>
-    <td><input class="bo-inp" value="${(m.job||'').replace(/"/g,'&quot;')}" placeholder="${t('manut_job_ph')}" onchange="boManutSet(${i},'job',this.value)"></td>
-    <td><div class="wa-cell"><input class="bo-inp" style="width:140px" value="${(m.phone||'').replace(/"/g,'&quot;')}" placeholder="+39 333 1234567" onchange="boManutSet(${i},'phone',this.value)">${manutPhone(m).length>=6?`<button class="wa-mini" title="${t('wa_direct')}" onclick="waTo('${(m.phone||'').replace(/'/g,'')}','')">💬</button>`:''}</div></td>
-    <td><button class="bo-del" onclick="boDelManut(${i})">🗑</button></td>
+    <td class="c-nome" data-l="${t('th_name')}"><input class="bo-inp" value="${(m.name||'').replace(/"/g,'&quot;')}" placeholder="${t('th_name')}" onchange="boManutSet(${i},'name',this.value)"></td>
+    <td data-l="${t('manut_job')}"><input class="bo-inp" value="${(m.job||'').replace(/"/g,'&quot;')}" placeholder="${t('manut_job_ph')}" onchange="boManutSet(${i},'job',this.value)"></td>
+    <td data-l="WhatsApp"><div class="wa-cell"><input class="bo-inp" style="width:140px" value="${(m.phone||'').replace(/"/g,'&quot;')}" placeholder="+39 333 1234567" onchange="boManutSet(${i},'phone',this.value)">${manutPhone(m).length>=6?`<button class="wa-mini" title="${t('wa_direct')}" onclick="waTo('${(m.phone||'').replace(/'/g,'')}','')">💬</button>`:''}</div></td>
+    <td class="c-del"><button class="bo-del" onclick="boDelManut(${i})">🗑</button></td>
   </tr>`).join('');
   const manutBlock=`<h2 class="sec" style="margin-top:26px">🔧 ${t('manut_h')}</h2><div class="lead">${t('manut_lead')}</div>
     <div class="bo-add"><button class="btn solid" onclick="boAddManut()">${t('manut_add')}</button></div>
