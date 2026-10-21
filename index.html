@@ -3444,7 +3444,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-10-21.3';
+const APP_VERSIONE='2026-10-21.4';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
@@ -3600,7 +3600,12 @@ function scatolaApplicaDati(dati,fonte){
     const etaFile=dati.generato?Math.max(0,Math.round((Date.now()-Date.parse(dati.generato))/1000)):null;
     let fFile=null;
     if(etaFile!=null){
-      const st=etaFile>3600?'rosso':(etaFile>=900?'giallo':'verde');
+      // Soglie tarate sull'attivita' oraria che riscrive il file. Verde fino a
+      // 75 minuti copre l'ora piu' il tempo di esecuzione; giallo significa
+      // "un giro saltato", rosso "fermo da piu' di due ore". Con le soglie di
+      // prima (15 minuti) la riga restava gialla per tre quarti di ogni ora, e
+      // un avviso sempre acceso non lo guarda piu' nessuno.
+      const st=etaFile>9000?'rosso':(etaFile>4500?'giallo':'verde');
       fFile={stato:st,dettaglio:'importazione di '+Math.round(etaFile/60)+' min fa'};
     }
     const peggio=(a,b)=>{
