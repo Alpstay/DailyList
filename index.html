@@ -3442,7 +3442,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-10-21.1';
+const APP_VERSIONE='2026-10-21.2';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
@@ -3456,7 +3456,13 @@ async function scatolaChiave(){
   if(CHIAVE_SCATOLA) return CHIAVE_SCATOLA;
   if(!fdb) return null;
   const snap=await fdb.ref('config/chiaveScatola').once('value');
-  const v=snap.val();
+  let v=snap.val();
+  // La chiave la scrive una persona nella console di Firebase: ci arrivano
+  // spazi a capo e virgolette rimaste dall'incollare. Togliere quelli qui
+  // costa due righe ed evita un "chiave sbagliata" che non si spiega.
+  if(typeof v==='string'){
+    v=v.trim().replace(/^["'“‘]+|["'”’]+$/g,'').trim();
+  }
   CHIAVE_SCATOLA=(typeof v==='string'&&v.length>=12)?v:null;
   return CHIAVE_SCATOLA;
 }
