@@ -1520,30 +1520,43 @@ const saveTicker=()=>{
   if(fdb){try{fdb.ref('console/ticker').set(TICKER);}catch(e){}}
 };
 const TIC_ICON={time:'🕗',change:'🔄',move:'🔀',add:'➕',cancel:'❌',ready:'✅',check:'🔎',checkout:'🧹',note:'📢',maint:'🔧'};
-// In demo inseriamo UNA variazione live d'esempio per struttura;
-// in produzione il ticker si riempie solo con le variazioni reali che arrivano da Slope.
-(function seedTicker(){ if(TICKER.length) return; [
-  {prop:'saslong',t:'10:05',type:'change',key:'ev_twin',params:['112']},
-  {prop:'hartmann',t:'11:20',type:'move',key:'ev_move',params:['23','25']},
-].forEach(e=>TICKER.push({id:newTid(),read:false,...e})); TICKER.push({id:newTid(),read:false,prop:'acadia',t:'11:20',type:'note',text:'9 · 2 cuscini in più'}); })();
 // NB: in produzione TICKER sarà alimentato dalle VARIAZIONI inserite in Slope
 // e sincronizzate nella databox (nuovi arrivi, cambi orario/camera/letti, annullamenti).
-function pushTicker(prop,type,key,params){ TICKER.unshift({id:newTid(),prop,type,key,params:params||[],t:nowHM(),read:false}); saveTicker(); }
+// La stanza si porta dietro l'avviso: serve a mandarlo al piano giusto e a
+// farlo sparire quando il guasto viene chiuso.
+const stanzaDa=x=>{ const m=String(x==null?'':x).match(/^\s*(\d{1,4})\b/); return m?m[1]:null; };
+function pushTicker(prop,type,key,params){ TICKER.unshift({id:newTid(),prop,type,key,params:params||[],rn:stanzaDa((params||[])[0]),t:nowHM(),read:false}); saveTicker(); }
 const TK_ALLOWED=['change','move','note','maint']; // solo: disposizione letti, cambio stanza, note manuali, manutenzione
-function tickerFor(prop){ return TICKER.filter(e=>!e.read && TK_ALLOWED.indexOf(e.type)>=0 && (e.prop===prop||e.prop==='*')); }
+function guastoAperto(prop,rn){ return !!(MAINT[prop]&&MAINT[prop][rn]); }
+// Un avviso di manutenzione vive quanto il guasto: quando il manutentore
+// conferma l'intervento il guasto sparisce da `maint`, e con lui l'avviso
+// LIVE, ovunque. Prima restava li' finche' qualcuno non premeva "fatto", e
+// la bacheca si riempiva di riparazioni gia' fatte.
+// Chi ha dei piani assegnati vede solo gli avvisi delle sue stanze: alla
+// ragazza del primo piano non serve sapere che al terzo manca un asciugamano,
+// e una bacheca piena di cose altrui si smette di leggere. Gli avvisi senza
+// numero di stanza (le note generali) restano per tutti.
+function tickerVisibile(e,prop){
+  if(SESSION.role==='admin') return true;
+  const miei=SESSION.floors||[];
+  if(!miei.length||!e.rn) return true;
+  return miei.indexOf(floorOf(e.prop==='*'?prop:e.prop,e.rn))>=0;
+}
+function tickerFor(prop){ return TICKER.filter(e=>!e.read && TK_ALLOWED.indexOf(e.type)>=0 && (e.prop===prop||e.prop==='*')
+  && !(e.type==='maint' && e.rn && !guastoAperto(e.prop==='*'?prop:e.prop,e.rn))
+  && tickerVisibile(e,prop)); }
 function tickerAck(id){ const e=TICKER.find(x=>String(x.id)===String(id)); if(e)e.read=true; saveTicker(); renderModule(); }
-function tickerDemo(){ const rr=()=>String(200+Math.floor(Math.random()*140)); const notes=['2 cuscini in più','aggiungere saponette','1 asciugamano extra','culla in camera']; const pick=Math.floor(Math.random()*3); if(pick===0){ pushTicker(SESSION.prop,'change','ev_bedchg',[]); } else if(pick===1){ pushTicker(SESSION.prop,'move','ev_move',[rr(),rr()]); } else { pushTickerText(SESSION.prop,'note',rr()+' · '+notes[Math.floor(Math.random()*notes.length)]); } renderModule(); }
 function renderTicker(){
   const list=tickerFor(SESSION.prop);
   if(!list.length){
-    return `<div class="ticker empty"><div class="tk-live"><span class="tk-dot"></span>LIVE</div><span class="tk-empty">${t('tk_empty')}</span><button class="tk-demo" onclick="tickerDemo()" title="Demo: simula una variazione (in produzione arriva da Slope)">＋</button></div>`;
+    return `<div class="ticker empty"><div class="tk-live"><span class="tk-dot"></span>LIVE</div><span class="tk-empty">${t('tk_empty')}</span></div>`;
   }
   const dur=Math.max(16,list.length*7);
   const items=list.map(e=>`<span class="tk-item"><span class="tk-ic">${TIC_ICON[e.type]||'•'}</span><span class="tk-tx"><b>${e.t}</b> ${e.text!=null?e.text:t(e.key,...(e.params||[]))}</span><button class="tk-ack" onclick="tickerAck('${e.id}')">${t('tk_done')}</button></span>`).join('');
   return `<div class="ticker">
     <div class="tk-live"><span class="tk-dot"></span>LIVE<span class="tk-cnt">${list.length}</span></div>
     <div class="tk-vp"><div class="tk-track">${items}</div></div>
-    <button class="tk-demo" onclick="tickerDemo()" title="Demo: simula una variazione (in produzione arriva da Slope)">＋</button>
+    
   </div>`;
 }
 
@@ -1991,7 +2004,7 @@ function registerCheckout(rn){
   if(p){ p.checkout=true; pushTicker(SESSION.prop,'checkout','ev_checkout',[rn]); }
   renderModule();
 }
-function pushTickerText(prop,type,text){ TICKER.unshift({id:newTid(),prop,type,text,t:nowHM(),read:false}); saveTicker(); }
+function pushTickerText(prop,type,text,rn){ TICKER.unshift({id:newTid(),prop,type,text,rn:rn||stanzaDa(text),t:nowHM(),read:false}); saveTicker(); }
 // Apre WhatsApp su un numero preciso (vuoto = WhatsApp senza destinatario, si sceglie la chat/gruppo).
 function waTo(phone,msg){ const num=(phone||'').replace(/[^0-9]/g,''); waApri((num?('https://wa.me/'+num):'https://wa.me/')+'?text='+encodeURIComponent(msg)); }
 // Messaggio diretto a una collaboratrice (dal suo numero in anagrafica Collaboratori & PIN).
@@ -2215,7 +2228,7 @@ function reportFault(){ const rn=(document.getElementById('rfRoom').value||'').t
   const testo=[cat?catLabel(cat):'',tx].filter(Boolean).join(' · ');
   maintPush(SESSION.prop,rn,{text:testo,cat,at:nowHM(),by:SESSION.name||''});
   repairOpen(SESSION.prop,rn,testo,'reception',false,cat);
-  pushTickerText(SESSION.prop,'maint',t('th_room')+' '+rn+(testo?': '+testo:''));
+  pushTickerText(SESSION.prop,'maint',t('th_room')+' '+rn+(testo?': '+testo:''),rn);
   waMaint(t('maint_body')+' '+t('th_room')+' '+rn+': '+testo+'\n\n'+t('fix_prompt')+'\n'+fixLink(SESSION.prop,rn)); renderModule(); }
 function maintSolved(rn){ repairClose(SESSION.prop,rn); maintRemove(SESSION.prop,rn); renderModule(); openRoom(rn); }
 function next2am(){ const e=new Date(); e.setHours(2,0,0,0); if(e.getTime()<=Date.now()) e.setDate(e.getDate()+1); return e.getTime(); }
@@ -2429,7 +2442,7 @@ function sendFaultReport(){
   const testo=[FAULT_CAT?catLabel(FAULT_CAT):'',det].filter(Boolean).join(' · ')||t('cat_altro');
   maintPush(prop,rn,{text:testo,cat:FAULT_CAT,at:nowHM(),by:SESSION.name||''});
   repairOpen(prop,rn,testo,'piani',false,FAULT_CAT);
-  pushTickerText(prop,'maint',t('th_room')+' '+rn+' · '+testo);
+  pushTickerText(prop,'maint',t('th_room')+' '+rn+' · '+testo,rn);
   closeFaultReport();
   waMaint(t('th_room')+' '+rn+' · '+testo+'\n\n'+t('fix_prompt')+'\n'+fixLink(prop,rn));
   renderModule();
@@ -2456,7 +2469,7 @@ function sendFaultPhoto(){
   maintPush(prop,rn,{text:t('maint_photo').replace('📷 ',''),at:nowHM(),by:SESSION.name||''});
   repairOpen(prop,rn,[FAULT_CAT?catLabel(FAULT_CAT):'',t('maint_photo').replace('📷 ','')]
     .filter(Boolean).join(' · '),'piani',true,FAULT_CAT);
-  pushTickerText(prop,'maint',t('th_room')+' '+rn+' 📷');
+  pushTickerText(prop,'maint',t('th_room')+' '+rn+' 📷',rn);
 
   let daInviare=file;
   try{
@@ -3503,7 +3516,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-10-21.8';
+const APP_VERSIONE='2026-10-21.10';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
@@ -4411,10 +4424,9 @@ function handleFixLink(){
 function fixConfirm(){
   if(!FIX_CTX) return; const {prop,rn}=FIX_CTX;
   repairClose(prop,rn); maintRemove(prop,rn);
-  // La bacheca LIVE non si scrive da una sessione anonima: l'anonimo e' il
-  // manutentore, e le regole gli concedono solo il percorso dei guasti. La
-  // reception vede comunque il guasto sparire dall'elenco.
-  if(!utenteAnonimo()) pushTickerText(prop,'maint',t('th_room')+' '+rn+' · '+t('fix_done_h'));
+  // Niente avviso "riparazione fatta" sulla LIVE: chiudendo il guasto
+  // l'avviso di partenza sparisce da solo su tutti i telefoni, e aggiungerne
+  // un secondo riempirebbe la bacheca di cose gia' risolte.
   document.getElementById('fixMsg').innerHTML=`<div class="fix-ok">✓</div><h1>${t('fix_done_h')}</h1><p>${t('fix_done_t',rn)}</p><button class="btn solid" onclick="location.href=location.pathname">${t('fix_close')}</button>`;
 }
 /* ===================== ACCESSO ===================== */
