@@ -513,6 +513,7 @@ details.rec-actions.rp:not([open]) .rp-sum::after{transform:rotate(-90deg)}
 .dchip .m{font-size:11px;opacity:.8}
 .lav-grid{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start}
 @media(max-width:780px){ .lav-grid{grid-template-columns:1fr} .lav-cart{position:static!important} }
+.lav-print{width:100%;margin-top:11px;justify-content:center}
 .lav-cart{background:var(--gold-soft);border:1px solid var(--line);border-radius:14px;padding:11px 13px;position:sticky;top:80px}
 .lav-cart h3{font-family:var(--display);font-weight:700;font-size:15px;margin:0 0 7px}
 .lav-cart table{width:100%;border-collapse:collapse}
@@ -738,7 +739,7 @@ const I18N={
   tab_arr:'Arrivi', tab_dep:'Partenze', tab_rooms:'Stato camere', tab_dash:'Dashboard', tab_keys:'Chiavi', rd_today:'Oggi', rd_tomorrow:'Domani', rd_yesterday:'Ieri',
   arr_h:'Arrivi di oggi', arr_h_day:'Arrivi', arr_lead:'Chi si presenta al banco, con letti e attenzioni.', pax:'pax', no_att:'nessuna attenzione',
   dep_h:'Partenze di oggi', dep_h_day:'Partenze', dep_lead:'Stanze che si liberano. Il check-out effettivo arriverà da Slope.',
-  co_done:'✓ check-out effettuato', co_todo:'in partenza · check-out da fare', co_unknown:'in partenza · check-out non rilevabile', co_do:'Registra check-out', none_arr:'Nessun arrivo.', none_dep:'Nessuna partenza.', pr_print:'🖨 Stampa', pr_note:'Note e promemoria', pr_balance:'Saldo aperto', pr_status:'Stato', pr_paid:'saldato', pr_printed:'Stampato il', pr_none:'—', pr_cart_title:'Biancheria da preparare per domani', pr_totals:'Totale da caricare sul carrello', pr_reason:'Motivo', pr_arr:'Arrivo',
+  co_done:'✓ check-out effettuato', co_todo:'in partenza · check-out da fare', co_unknown:'in partenza · check-out non rilevabile', co_do:'Registra check-out', none_arr:'Nessun arrivo.', none_dep:'Nessuna partenza.', pr_print:'🖨 Stampa', pr_note:'Note e promemoria', pr_balance:'Saldo aperto', pr_status:'Stato', pr_paid:'saldato', pr_printed:'Stampato il', pr_none:'—', pr_cart_title:'Biancheria da preparare per domani', pr_totals:'Totale da caricare sul carrello', pr_cfg_tbd:'Da verificare', pr_lav_all:'Totale dei giorni scelti', pr_reason:'Motivo', pr_arr:'Arrivo',
   rooms_h:'Stato camere', rooms_lead:'{0}/{1} pronte · aggiornato dai Piani in tempo reale (in questa demo, cambiando reparto nella stessa finestra).',
   st_ready:'Pronta', st_wip:'In corso', st_todo:'Da fare', stay_short:'soggiorno', stay_dn:'Soggiorno · giorno {0} su {1}', st_fermata:'Fermata', st_partenza:'Partenza', st_dentro:'Parte oggi — ancora dentro', st_arrivo:'Arrivo', st_inpart:'In partenza', st_libera:'Libera — si può pulire', st_controllo:'Controllo', st_inwork:'In rifacimento', st_fatta:'Fatta',
   keys_h:'Programmazione chiavi', keys_lead:'{0} gruppi/nuclei · {1} stanze in arrivo · {2} chiavi da programmare. Programma insieme le chiavi dello stesso gruppo.',
@@ -783,7 +784,7 @@ const I18N={
   tab_arr:'Arrivals', tab_dep:'Departures', tab_rooms:'Room status', tab_dash:'Dashboard', tab_keys:'Keys', rd_today:'Today', rd_tomorrow:'Tomorrow', rd_yesterday:'Yesterday',
   arr_h:'Today’s arrivals', arr_h_day:'Arrivals', arr_lead:'Who shows up at the desk, with beds and alerts.', pax:'pax', no_att:'no alerts',
   dep_h:'Today’s departures', dep_h_day:'Departures', dep_lead:'Rooms being freed. The actual check-out will come from Slope.',
-  co_done:'✓ checked out', co_todo:'leaving · check-out pending', co_unknown:'leaving · check-out status unknown', co_do:'Register check-out', none_arr:'No arrivals.', none_dep:'No departures.', pr_print:'🖨 Print', pr_note:'Notes & reminders', pr_balance:'Open balance', pr_status:'Status', pr_paid:'paid', pr_printed:'Printed on', pr_none:'—', pr_cart_title:'Linen to prepare for tomorrow', pr_totals:'Total to load on the cart', pr_reason:'Reason', pr_arr:'Arrival',
+  co_done:'✓ checked out', co_todo:'leaving · check-out pending', co_unknown:'leaving · check-out status unknown', co_do:'Register check-out', none_arr:'No arrivals.', none_dep:'No departures.', pr_print:'🖨 Print', pr_note:'Notes & reminders', pr_balance:'Open balance', pr_status:'Status', pr_paid:'paid', pr_printed:'Printed on', pr_none:'—', pr_cart_title:'Linen to prepare for tomorrow', pr_totals:'Total to load on the cart', pr_cfg_tbd:'To be checked', pr_lav_all:'Total for the selected days', pr_reason:'Reason', pr_arr:'Arrival',
   rooms_h:'Room status', rooms_lead:'{0}/{1} ready · updated by Housekeeping in real time (in this demo, by switching department in the same window).',
   st_ready:'Ready', st_wip:'In progress', st_todo:'To do', stay_short:'stay', stay_dn:'Stay · day {0} of {1}', st_fermata:'Stay-over', st_partenza:'Departure', st_dentro:'Leaving today — still in', st_arrivo:'Arrival', st_inpart:'Departing', st_libera:'Vacant — ready to clean', st_controllo:'Check', st_inwork:'Being cleaned', st_fatta:'Done',
   keys_h:'Key programming', keys_lead:'{0} groups/families · {1} arriving rooms · {2} keys to program. Program keys for the same group together.',
@@ -828,7 +829,7 @@ const I18N={
   tab_arr:'Sosiri', tab_dep:'Plecări', tab_rooms:'Starea camerelor', tab_dash:'Panou', tab_keys:'Chei', rd_today:'Azi', rd_tomorrow:'Mâine', rd_yesterday:'Ieri',
   arr_h:'Sosirile de azi', arr_h_day:'Sosiri', arr_lead:'Cine se prezintă la recepție, cu paturi și atenționări.', pax:'pers.', no_att:'nicio atenționare',
   dep_h:'Plecările de azi', dep_h_day:'Plecări', dep_lead:'Camere care se eliberează. Check-out-ul efectiv va veni din Slope.',
-  co_done:'✓ check-out efectuat', co_todo:'la plecare · check-out de făcut', co_unknown:'la plecare · stare check-out necunoscută', co_do:'Înregistrează check-out', none_arr:'Nicio sosire.', none_dep:'Nicio plecare.', pr_print:'🖨 Tipărește', pr_note:'Note și memento', pr_balance:'Sold deschis', pr_status:'Stare', pr_paid:'achitat', pr_printed:'Tipărit la', pr_none:'—', pr_cart_title:'Lenjerie de pregătit pentru mâine', pr_totals:'Total de încărcat pe cărucior', pr_reason:'Motiv', pr_arr:'Sosire',
+  co_done:'✓ check-out efectuat', co_todo:'la plecare · check-out de făcut', co_unknown:'la plecare · stare check-out necunoscută', co_do:'Înregistrează check-out', none_arr:'Nicio sosire.', none_dep:'Nicio plecare.', pr_print:'🖨 Tipărește', pr_note:'Note și memento', pr_balance:'Sold deschis', pr_status:'Stare', pr_paid:'achitat', pr_printed:'Tipărit la', pr_none:'—', pr_cart_title:'Lenjerie de pregătit pentru mâine', pr_totals:'Total de încărcat pe cărucior', pr_cfg_tbd:'De verificat', pr_lav_all:'Total pentru zilele alese', pr_reason:'Motiv', pr_arr:'Sosire',
   rooms_h:'Starea camerelor', rooms_lead:'{0}/{1} gata · actualizat de Cameriste în timp real (în această demo, schimbând departamentul în aceeași fereastră).',
   st_ready:'Gata', st_wip:'În curs', st_todo:'De făcut', stay_short:'sejur', stay_dn:'Sejur · ziua {0} din {1}', st_fermata:'Rămâne', st_partenza:'Plecare', st_dentro:'Pleacă azi — încă înăuntru', st_arrivo:'Sosire', st_inpart:'La plecare', st_libera:'Liberă — se poate curăța', st_controllo:'Verificare', st_inwork:'În refacere', st_fatta:'Gata',
   keys_h:'Programarea cheilor', keys_lead:'{0} grupuri/familii · {1} camere în sosire · {2} chei de programat. Programează împreună cheile aceluiași grup.',
@@ -873,7 +874,7 @@ const I18N={
   tab_arr:'Mbërritje', tab_dep:'Nisje', tab_rooms:'Statusi i dhomave', tab_dash:'Paneli', tab_keys:'Çelësat', rd_today:'Sot', rd_tomorrow:'Nesër', rd_yesterday:'Dje',
   arr_h:'Mbërritjet e sotme', arr_h_day:'Mbërritje', arr_lead:'Kush paraqitet në banak, me shtretër dhe kujdese.', pax:'pers.', no_att:'asnjë kujdes',
   dep_h:'Nisjet e sotme', dep_h_day:'Nisje', dep_lead:'Dhoma që lirohen. Check-out-i aktual do të vijë nga Slope.',
-  co_done:'✓ dalje e kryer', co_todo:'në nisje · check-out për t’u bërë', co_unknown:'në nisje · statusi i daljes i panjohur', co_do:'Regjistro check-out', none_arr:'Asnjë mbërritje.', none_dep:'Asnjë nisje.', pr_print:'🖨 Printo', pr_note:'Shënime & kujtesa', pr_balance:'Balancë e hapur', pr_status:'Statusi', pr_paid:'e paguar', pr_printed:'Printuar më', pr_none:'—', pr_cart_title:'Lino për të përgatitur për nesër', pr_totals:'Totali për të ngarkuar në karrocë', pr_reason:'Arsyeja', pr_arr:'Mbërritje',
+  co_done:'✓ dalje e kryer', co_todo:'në nisje · check-out për t’u bërë', co_unknown:'në nisje · statusi i daljes i panjohur', co_do:'Regjistro check-out', none_arr:'Asnjë mbërritje.', none_dep:'Asnjë nisje.', pr_print:'🖨 Printo', pr_note:'Shënime & kujtesa', pr_balance:'Balancë e hapur', pr_status:'Statusi', pr_paid:'e paguar', pr_printed:'Printuar më', pr_none:'—', pr_cart_title:'Lino për të përgatitur për nesër', pr_totals:'Totali për të ngarkuar në karrocë', pr_cfg_tbd:'Për t’u verifikuar', pr_lav_all:'Totali i ditëve të zgjedhura', pr_reason:'Arsyeja', pr_arr:'Mbërritje',
   rooms_h:'Statusi i dhomave', rooms_lead:'{0}/{1} gati · përditësuar nga Pastrimi në kohë reale (në këtë demo, duke ndryshuar repartin në të njëjtën dritare).',
   st_ready:'Gati', st_wip:'Në progres', st_todo:'Për t’u bërë', stay_short:'qëndrim', stay_dn:'Qëndrim · dita {0} nga {1}', st_fermata:'Qëndron', st_partenza:'Nisje', st_dentro:'Niset sot — ende brenda', st_arrivo:'Mbërritje', st_inpart:'Në nisje', st_libera:'E lirë — mund të pastrohet', st_controllo:'Kontroll', st_inwork:'Në pastrim', st_fatta:'U krye',
   keys_h:'Programimi i çelësave', keys_lead:'{0} grupe/familje · {1} dhoma në mbërritje · {2} çelësa për t’u programuar. Programo bashkë çelësat e të njëjtit grup.',
@@ -3516,7 +3517,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-10-21.10';
+const APP_VERSIONE='2026-10-21.11';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
@@ -3883,10 +3884,93 @@ function viewLavanderia(){
   return `<h2 class="sec">${t('lav_h')}</h2><div class="lead">${t('lav_lead')}${sel.length>1?` · <b>${sel.length} ${t('lav_days_sel')}</b>`:''}</div>
     <div class="lav-days">${chips}</div>
     <div class="lav-grid">
-      <div class="lav-cart"><h3>${t('lav_prep', rooms.length, (nCambi?t('lav_change',nCambi):''), tot.posti)}</h3><table><tbody>${cart}</tbody></table></div>
+      <div class="lav-cart"><h3>${t('lav_prep', rooms.length, (nCambi?t('lav_change',nCambi):''), tot.posti)}</h3><table><tbody>${cart}</tbody></table>
+        <button class="printbtn lav-print" onclick="printLavanderia()">🖨 ${t('pr_print')}</button></div>
       <div><table class="data"><thead><tr><th>${t('th_room')}</th><th>${t('th_type')}</th><th>${t('th_cfg')}</th><th>${t('th_matr')}</th><th>${t('th_sing')}</th><th>${t('th_fed')}</th><th>${t('th_copri')}</th><th>${t('th_tap')}</th><th>${t('th_asc')}</th><th>${t('th_teli')}</th></tr></thead><tbody>${rows}</tbody></table>
       <div class="note">${t('lav_note')}</div></div>
     </div>`;
+}
+// Stampa della lavanderia: segue i giorni selezionati nel riquadro, non "domani"
+// come quella del carrello delle ragazze. In lavanderia il foglio si attacca al
+// carrello e ci si lavora sopra: prima i totali (quanto tirare fuori
+// dall'armadio), poi il dettaglio per stanza, con una pagina per giorno quando
+// i giorni selezionati sono piu' di uno.
+function printLavanderia(){
+  const prop=SESSION.prop, propName=(PROPS.find(p=>p.id===prop)||{}).full||'';
+  const days=forecast(), sel=LAVDAYS.slice().sort((a,b)=>a-b);
+  const esc=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const dataDi=d=>giornoLungo(isoLocal(d),true);
+  const COL=[['th_matr','lenzMatr'],['th_sing','lenzSing'],['th_fed','federe'],['th_copri','copriletti'],
+             ['th_tap','tappetino'],['th_asc','asciugamani'],['th_teli','teli']];
+
+  const tabella=rs=>{
+    const righe=rs.slice().sort((a,b)=>(parseInt(a.rn)||0)-(parseInt(b.rn)||0)).map(r=>
+      `<tr><td class="c-rn">${esc(r.rn)}</td><td>${esc(r.type)}${r.kind==='cambio'?' <b>'+esc(t('badge_change').replace('🔄 ',''))+'</b>':''}</td>`
+      +`<td>${esc(r.config||t('pr_cfg_tbd'))}</td>`
+      +COL.map(([,k])=>`<td class="q">${r.linen[k]||''}</td>`).join('')+'</tr>').join('');
+    const tot=sumLinen(rs);
+    const piede=`<tr class="tot"><td colspan="3">${esc(t('pr_totals'))}</td>`
+      +COL.map(([,k])=>`<td class="q">${tot[k]||0}</td>`).join('')+'</tr>';
+    return `<table><thead><tr><th class="c-rn">#</th><th>${esc(t('th_type'))}</th><th>${esc(t('th_cfg'))}</th>`
+      +COL.map(([k])=>`<th class="q">${esc(t(k))}</th>`).join('')
+      +`</tr></thead><tbody>${righe||'<tr><td colspan="10" style="text-align:center;color:#8a8676;padding:18px">—</td></tr>'}</tbody><tfoot>${piede}</tfoot></table>`;
+  };
+
+  let tutte=[], corpo='';
+  sel.forEach((i,n)=>{
+    const lista=[...days[i].list.map(a=>({...a,kind:'arrivo'})), ...stayChangesForDay(prop,i)];
+    const {rooms:rs}=cartFor(lista); tutte=tutte.concat(lista);
+    const tt=sumLinen(rs);
+    const totali=LROWS.filter(([k])=>tt[k]>0).map(([k])=>
+      `<tr><td>${esc(t('lin_'+k))}</td><td class="q">${tt[k]}</td></tr>`).join('');
+    const nc=rs.filter(r=>r.kind==='cambio').length;
+    corpo+=`<section class="pg${n<sel.length-1?' pb':''}">
+      <div class="hd"><div><div class="brand">AlpStay</div><div class="prop">${esc(propName)}</div></div>
+        <div class="ttl"><h1>${esc(t('lav_h'))}</h1><div class="dt">${esc(dataDi(days[i].date))}</div></div></div>
+      <div class="sub">${esc(rs.length)} ${esc(t('bo_stanze').toLowerCase())} · ${esc(tt.posti)} 🛏${nc?' · '+esc(t('lav_change',nc)):''}</div>
+      <h2>${esc(t('pr_totals'))}</h2>
+      <table class="totals"><tbody>${totali||'<tr><td>—</td><td class="q">0</td></tr>'}</tbody></table>
+      <h2>${esc(t('cart_detail',rs.length))}</h2>
+      ${tabella(rs)}
+      <div class="ft">${esc(t('pr_printed'))} ${esc((new Date()).toLocaleString())} — AlpStay · ${esc(typeof scatolaStamp==='function'?scatolaStamp():'')}</div>
+    </section>`;
+  });
+
+  // Con piu' giorni insieme serve anche il totale complessivo: e' quello che la
+  // lavanderia deve avere pronto in tutto, non giorno per giorno.
+  if(sel.length>1){
+    const tt=cartFor(tutte).tot;
+    const totali=LROWS.filter(([k])=>tt[k]>0).map(([k])=>
+      `<tr><td>${esc(t('lin_'+k))}</td><td class="q">${tt[k]}</td></tr>`).join('');
+    corpo+=`<section class="pg pbefore">
+      <div class="hd"><div><div class="brand">AlpStay</div><div class="prop">${esc(propName)}</div></div>
+        <div class="ttl"><h1>${esc(t('pr_lav_all'))}</h1><div class="dt">${esc(sel.length)} ${esc(t('lav_days_sel'))}</div></div></div>
+      <table class="totals"><tbody>${totali||'<tr><td>—</td><td class="q">0</td></tr>'}</tbody></table>
+      <div class="ft">${esc(t('pr_printed'))} ${esc((new Date()).toLocaleString())} — AlpStay</div>
+    </section>`;
+  }
+
+  printHTML(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(propName)} · ${esc(t('lav_h'))}</title>
+  <style>
+    *{box-sizing:border-box} body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#16232a;margin:28px}
+    .hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #16232a;padding-bottom:10px}
+    .brand{font-weight:800;font-size:22px} .prop{font-size:13px;color:#5b6b73;margin-top:2px}
+    .ttl{text-align:right} .ttl h1{margin:0;font-size:18px} .ttl .dt{font-size:12px;color:#5b6b73}
+    .sub{margin:10px 0 2px;font-size:13px;color:#5b6b73}
+    h2{font-size:14px;margin:18px 0 6px;text-transform:uppercase;letter-spacing:.05em;color:#5b6b73}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th{background:#f3efe7;text-align:left;padding:7px 8px;border-bottom:2px solid #d8cfbf;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:#5b6b73}
+    td{padding:8px;border-bottom:1px solid #e7e1d5}
+    .q{text-align:right;font-variant-numeric:tabular-nums} th.q{text-align:right}
+    .c-rn{font-weight:800;width:42px}
+    .totals{width:auto;min-width:260px} .totals td:first-child{font-weight:600}
+    .totals .q{font-weight:800;font-size:16px;width:70px}
+    tbody tr:nth-child(even) td{background:#faf8f3}
+    tfoot .tot td{border-top:2px solid #16232a;font-weight:800;background:#fff}
+    .ft{margin-top:14px;font-size:11px;color:#8a8676}
+    .pb{page-break-after:always} .pbefore{page-break-before:always}
+    @media print{ body{margin:10mm} }
+  </style></head><body>${corpo}</body></html>`);
 }
 function setLavDay(i){ const idx=LAVDAYS.indexOf(i); if(idx>=0){ if(LAVDAYS.length>1) LAVDAYS.splice(idx,1); } else LAVDAYS.push(i); renderModule(); }
 
