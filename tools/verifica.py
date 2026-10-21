@@ -47,7 +47,7 @@ def main():
     # Il file non deve contenere soggiorni in chiaro: se li trovo, la
     # cifratura non ha funzionato e il file non va pubblicato.
     testo = json.dumps(d, ensure_ascii=False)
-    if '"strutture"' in testo or '"resId"' in testo:
+    if '"strutture"' in testo or '"resId"' in testo or '"guest"' in testo:
         guasto('dati dei soggiorni in chiaro nel file')
 
     generato = datetime.datetime.fromisoformat(d['generato'])

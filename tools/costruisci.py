@@ -8,7 +8,14 @@ di servizio (quando e' stato generato, la finestra, la freschezza), che servono
 alla pagina per accendere il semaforo prima ancora di decifrare.
 
 Uso:
-  python3 tools/costruisci.py CHIAVE uscita.json pagina1.txt[,pagina2.txt,...]
+  python3 tools/costruisci.py CHIAVE uscita.json soggiorni1.txt[,soggiorni2.txt,...] \
+                              [intestatari1.txt,intestatari2.txt,...]
+
+Il terzo argomento sono le pagine di `curated_operational_stays`. Il quarto,
+facoltativo, le pagine di `curated_guest_stays`: servono solo a prendere il
+NOME DELL'INTESTATARIO, perche' la reception riconosce una prenotazione dal
+nome, non dall'identificativo. Il nome finisce dentro la parte cifrata e mai
+nei dati di servizio in chiaro.
 
 Ogni pagina e' la risposta grezza di La Scatola, cosi' come il sistema l'ha
 salvata su file: {"data":[...], "freshness":{...}, "page":{...}}.
@@ -68,6 +75,28 @@ def riga(r):
     }
 
 
+def intestatari(percorsi):
+    """reservation_id -> "Cognome Nome" dell'intestatario della prenotazione."""
+    nomi = {}
+    for p in percorsi:
+        if not p:
+            continue
+        d = json.load(open(p, encoding='utf-8'))
+        for r in (d.get('data') or []):
+            res = str(r.get('reservation_id') or '')
+            if not UUID.fullmatch(res) or res in nomi:
+                continue
+            cog = (r.get('primary_guest_last_name') or '').strip()
+            nom = (r.get('primary_guest_first_name') or '').strip()
+            if not cog and not nom and r.get('is_primary_guest') is True:
+                cog = (r.get('last_name') or '').strip()
+                nom = (r.get('first_name') or '').strip()
+            nome = ' '.join(y for y in (cog, nom) if y)
+            if nome:
+                nomi[res] = nome
+    return nomi
+
+
 def cifra(payload, chiave, contesto):
     """AES-GCM con chiave derivata dalla password, stesso schema delle altre
     app AlpStay. `contesto` entra come dato autenticato: un file rimesso in
@@ -85,6 +114,7 @@ def main():
     if len(sys.argv) < 4:
         raise SystemExit(__doc__)
     chiave, uscita, percorsi = sys.argv[1], sys.argv[2], sys.argv[3].split(',')
+    nomi = intestatari(sys.argv[4].split(',')) if len(sys.argv) > 4 else {}
     if len(chiave) < 12:
         raise SystemExit('chiave troppo corta: servono almeno 12 caratteri')
 
@@ -101,7 +131,11 @@ def main():
             if rid in visti:                  # le pagine possono sovrapporsi
                 continue
             visti.add(rid)
-            strutture[chiave_prop]['soggiorni'].append(riga(r))
+            x = riga(r)
+            nome = nomi.get(x['resId'])
+            if nome:
+                x['guest'] = nome
+            strutture[chiave_prop]['soggiorni'].append(x)
         pag = d.get('page') or {}
         if attesi is None:
             attesi = pag.get('total')
@@ -127,8 +161,9 @@ def main():
     with open(uscita, 'w', encoding='utf-8') as f:
         json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
 
-    print('RIEPILOGO %s: %d soggiorni (attesi %s) · incompleta=%s · %d byte'
-          % (uscita, totale, attesi, incompleta, os.path.getsize(uscita)), file=sys.stderr)
+    con_nome = sum(1 for s in strutture.values() for x in s['soggiorni'] if x.get('guest'))
+    print('RIEPILOGO %s: %d soggiorni (attesi %s) · %d con intestatario · incompleta=%s · %d byte'
+          % (uscita, totale, attesi, con_nome, incompleta, os.path.getsize(uscita)), file=sys.stderr)
     for k, s in strutture.items():
         arr = sum(1 for x in s['soggiorni'] if x['cin'] == giorno)
         par = sum(1 for x in s['soggiorni'] if x['cout'] == giorno)
