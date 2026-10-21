@@ -1619,7 +1619,6 @@ function drawDots(){ const d=document.getElementById('pinDots'); d.innerHTML='';
 function pinKey(k){ buzz(30); const err=document.getElementById('pinErr'); err.textContent='';
   if(k==='C'){PINBUF='';} else if(k==='⌫'){PINBUF=PINBUF.slice(0,-1);} else if(PINBUF.length<6){PINBUF+=k;}
   drawDots();
-  if(PINBUF==='1234'){ enterRole(PINROLE); return; }
   const u=pinLookup(PINBUF);
   if(u && u.role===PINROLE){ enter(u); return; }
   if(PINBUF.length>=4){
@@ -3504,7 +3503,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-10-21.7';
+const APP_VERSIONE='2026-10-21.8';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
