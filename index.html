@@ -958,7 +958,31 @@ const DEMO={
 };
 
 /* stato operativo generato dallo staff (vive solo qui, non su Slope) */
-const ROOMSTATUS={saslong:{},hartmann:{},acadia:{}}; // rn -> {state:'ready'|'wip', by, at}
+// Stato delle stanze: rn -> {state:'ready'|'wip', by, at, giorno}.
+// Era una variabile e basta: "stanza pronta" restava sul telefono di chi lo
+// premeva, la reception non lo vedeva e bastava ricaricare la pagina per
+// perderlo. Ora sta nel database condiviso come manutenzione e posizioni.
+let ROOMSTATUS=LS.get('abo_roomstatus',null)||{saslong:{},hartmann:{},acadia:{}};
+ROOMSTATUS=roomStatusPulisci(ROOMSTATUS);   // la copia locale puo' essere di ieri
+// Il "pronta" vale per la giornata: domani la stanza va rifatta daccapo.
+function roomStatusPulisci(src){
+  const oggi=(typeof scatolaOggi==='function')?scatolaOggi():'';
+  const out={saslong:{},hartmann:{},acadia:{}};
+  Object.keys(out).forEach(pr=>{
+    const m=(src||{})[pr]||{};
+    Object.keys(m).forEach(rn=>{
+      const v=m[rn]; if(!v) return;
+      if(v.giorno&&oggi&&v.giorno!==oggi) return;   // roba di ieri: si ignora
+      out[pr][rn]=v;
+    });
+  });
+  return out;
+}
+function roomStatusSet(prop,rn,obj){
+  (ROOMSTATUS[prop]=ROOMSTATUS[prop]||{})[rn]=obj;
+  LS.set('abo_roomstatus',ROOMSTATUS);
+  if(fdb){try{ obj?fdb.ref('roomstatus/'+prop+'/'+rn).set(obj):fdb.ref('roomstatus/'+prop+'/'+rn).remove(); }catch(e){}}
+}
 const KEYPROG={saslong:{},hartmann:{},acadia:{}}; // id gruppo/stanza -> true se chiavi programmate
 let MAINT={saslong:{'112':{text:'Perdita rubinetto in bagno',at:'09:30'}},hartmann:{},acadia:{}}; // rn -> {text,at,by} richiesta manutenzione
 
@@ -1479,6 +1503,8 @@ function firebaseApp(){
 }
 function initFirebase(){ try{ if(!firebaseApp())return false; fdb=firebase.database(); fdb.ref('maint').on('value',snap=>{ const v=snap.val()||{}; MAINT={saslong:v.saslong||{},hartmann:v.hartmann||{},acadia:v.acadia||{}}; if(SESSION.role)renderModule(); }); fdb.ref('staffloc').on('value',snap=>{ const v=snap.val()||{}; STAFF_LOC={saslong:v.saslong||{},hartmann:v.hartmann||{},acadia:v.acadia||{}}; if(SESSION.role)renderModule(); }); fdb.ref('cleanstart').on('value',snap=>{ const v=snap.val()||{}; CLEAN_START={saslong:v.saslong||{},hartmann:v.hartmann||{},acadia:v.acadia||{}}; if(SESSION.role)renderModule(); }); fdb.ref('roomoverride').on('value',snap=>{ const v=snap.val()||{}; ROOM_OVERRIDE={saslong:v.saslong||{},hartmann:v.hartmann||{},acadia:v.acadia||{}}; if(SESSION.role)renderModule(); });
   fdb.ref('planningdone').on('value',snap=>{ const v=snap.val()||{}; PLANNING_DONE={saslong:v.saslong||{},hartmann:v.hartmann||{},acadia:v.acadia||{}}; if(SESSION.role)renderModule(); });
+  // "Stanza pronta": lo scrive chi è ai piani, lo deve vedere la reception.
+  fdb.ref('roomstatus').on('value',snap=>{ ROOMSTATUS=roomStatusPulisci(snap.val()||{}); LS.set('abo_roomstatus',ROOMSTATUS); if(SESSION.role)renderModule(); });
   // Anagrafica stanze e collaboratori: condivise tra i dispositivi. Se il database è ancora vuoto su questi
   // percorsi (primo collegamento), lo si "semina" con i dati locali attuali; da quel momento chi modifica da
   // un dispositivo (es. Backoffice) aggiorna tutti gli altri.
@@ -2545,7 +2571,8 @@ function setLostWa(v){ (SETTINGS[SESSION.prop]=SETTINGS[SESSION.prop]||{}).waLos
 function closeSheet(){ document.getElementById('sheetMount').innerHTML=''; }
 function setReady(rn,ready){
   if(ready){ const st=CLEAN_START[SESSION.prop]&&CLEAN_START[SESSION.prop][rn]; if(st){ logClean(SESSION.prop,rn,st.kind,st.type,Math.max(1,Math.round((Date.now()-st.t)/1000)),st.by||SESSION.name); cleanStartClear(SESSION.prop,rn); } if(SESSION.role==='piani') staffLocClear(SESSION.prop,SESSION.name); }
-  ROOMSTATUS[SESSION.prop][rn]= ready?{state:'ready',by:SESSION.name||'Piani',at:nowHM()}:{state:'todo'};
+  roomStatusSet(SESSION.prop,rn, ready?{state:'ready',by:SESSION.name||'Piani',at:nowHM(),giorno:scatolaOggi()}
+                                      :{state:'todo',by:SESSION.name||'',at:nowHM(),giorno:scatolaOggi()});
   if(ready) buzz([30,40,30]);
   closeSheet(); renderModule();
 }
@@ -3579,7 +3606,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-10-21.15';
+const APP_VERSIONE='2026-10-21.16';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
