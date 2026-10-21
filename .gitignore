@@ -1,0 +1,6 @@
+# I dati della Scatola non vanno MAI in questo repository: e' pubblico, quindi
+# qualunque file qui dentro finisce su un indirizzo apribile da chiunque
+# (https://alpstay.github.io/DailyList/...). I soggiorni, i nomi degli ospiti e
+# gli ID di Slope stanno nel database Firebase, dietro autenticazione.
+dati/
+*.giornata.json

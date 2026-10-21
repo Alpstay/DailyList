@@ -3381,6 +3381,8 @@ function scatolaMsgErrore(code,message){
     case 'fb_vuoto':            return 'Nessun dato nel database: l\'importazione dalla Scatola non ha ancora scritto nulla su "giornata".';
     case 'fb_non_pronto':       return 'Database non raggiungibile: controlla la connessione.';
     case 'fb_errore':           return 'Errore nella lettura dei dati dal database.';
+    case 'chiave_mancante':     return 'Manca la chiave per leggere i dati: in Firebase il percorso config/chiaveScatola e\' vuoto.';
+    case 'non_decifrabile':     return 'I dati non si aprono con la chiave presente: chiave sbagliata o file di un altro giorno.';
     case 'file_non_letto':       return 'File dei dati non trovato ('+FONTE_FILE.url+'): l\'importazione dalla Scatola non ha ancora scritto nulla.';
     case 'file_illeggibile':     return 'File dei dati non nel formato atteso: '+message;
     case 'tool_error':           return 'La Scatola ha rifiutato la richiesta: '+message;
@@ -3437,13 +3439,41 @@ function scatolaBanner(){
 //   "strutture":{ "saslong":{ "soggiorni":[{rn,cin,cout,adults,children,opt,over,resId,orderId}],
 //                             "nomi":{"<resId>":{"n":"Rossi Mara","lang":"it"}},
 //                             "saldi":{"<orderId>":145.5} }, ... } }
-const FONTE_FILE={ url:'dati/giornata.json', intervalloMs:300000 };
+const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-10-20.1';
+const APP_VERSIONE='2026-10-21.1';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
+}
+
+// La chiave per decifrare i soggiorni NON sta in questa pagina: la pagina e'
+// pubblica, e una chiave scritta qui dentro non proteggerebbe niente. Sta nel
+// database, dove la leggono solo gli account dello staff dopo l'accesso.
+let CHIAVE_SCATOLA=null;
+async function scatolaChiave(){
+  if(CHIAVE_SCATOLA) return CHIAVE_SCATOLA;
+  if(!fdb) return null;
+  const snap=await fdb.ref('config/chiaveScatola').once('value');
+  const v=snap.val();
+  CHIAVE_SCATOLA=(typeof v==='string'&&v.length>=12)?v:null;
+  return CHIAVE_SCATOLA;
+}
+
+// Stesso schema di tools/costruisci.py e delle altre app AlpStay:
+// PBKDF2-SHA256 per ricavare la chiave, AES-GCM per il contenuto, e il giorno
+// come dato autenticato — un file vecchio rimesso in circolazione non si apre.
+const _b64=s=>Uint8Array.from(atob(s),c=>c.charCodeAt(0));
+async function scatolaDecifra(e,chiave,contesto){
+  const td=new TextEncoder();
+  const mat=await crypto.subtle.importKey('raw',td.encode(chiave),'PBKDF2',false,['deriveKey']);
+  const key=await crypto.subtle.deriveKey(
+    {name:'PBKDF2',salt:_b64(e.salt),iterations:e.iter,hash:'SHA-256'},
+    mat,{name:'AES-GCM',length:256},false,['decrypt']);
+  const chiaro=await crypto.subtle.decrypt(
+    {name:'AES-GCM',iv:_b64(e.iv),additionalData:td.encode(contesto)},key,_b64(e.ct));
+  return JSON.parse(new TextDecoder().decode(chiaro));
 }
 
 async function scatolaCaricaDaFile(){
@@ -3460,6 +3490,21 @@ async function scatolaCaricaDaFile(){
     SCATOLA.err={code:'file_non_letto',message:String(e&&e.message||e)};
     scatolaBanner();
     return;
+  }
+  try{
+    const chiave=await scatolaChiave();
+    if(!chiave){
+      SCATOLA.stato='errore';
+      SCATOLA.err={code:'chiave_mancante',message:'config/chiaveScatola'};
+      scatolaBanner(); return;
+    }
+    const giorno=String(dati.generato||'').slice(0,10);
+    const dentro=await scatolaDecifra(dati.dati,chiave,giorno);
+    dati.strutture=dentro.strutture;
+  }catch(e){
+    SCATOLA.stato='errore';
+    SCATOLA.err={code:'non_decifrabile',message:String(e&&e.message||e)};
+    scatolaBanner(); return;
   }
   scatolaApplicaDati(dati,'file');
 }
@@ -3594,9 +3639,13 @@ async function scatolaInit(){
   let m=null;
   try{ m=(typeof claude!=='undefined'&&claude&&claude.use)?await claude.use('mcp'):null; }catch(e){ m=null; }
   if(!m&&fdb){
-    // Sito proprio, utente gia' entrato: i dati stanno nel database, protetti
-    // dalle regole. E' la strada normale.
-    scatolaAscoltaFirebase();
+    // Sito proprio, utente gia' entrato. I soggiorni NON stanno piu' nel
+    // database: li scrive ogni ora un'attivita' pianificata in scatola.json,
+    // cifrato, perche' da quell'attivita' Firebase non e' raggiungibile.
+    // Firebase resta per quello che scrive lo staff: planning, manutenzione,
+    // bacheca. La pagina rilegge il file ogni 5 minuti.
+    await scatolaCaricaDaFile();
+    setInterval(function(){ scatolaCaricaDaFile(); }, FONTE_FILE.intervalloMs);
     return;
   }
   if(!m){
