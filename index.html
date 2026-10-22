@@ -560,8 +560,8 @@ table.data .num{text-align:center;font-variant-numeric:tabular-nums}
 table.data .rn{font-family:var(--display);font-weight:700}
 .note{font-size:12px;color:var(--muted2);margin-top:14px;font-style:italic}
 .bedicons{display:inline-flex;gap:6px;align-items:flex-end}
-.bedic{height:21px;width:auto}
-.bedicons.sm .bedic{height:19px} .bedicons.sm{gap:5px}
+.bedic{height:26px;width:auto}
+.bedicons.sm .bedic{height:24px} .bedicons.sm{gap:5px}
 .bedicons.big .bedic{height:44px} .bedicons.big{gap:12px}
 .bedic.tall{height:27px} .bedicons.big .bedic.tall{height:54px} .bedicons.sm .bedic.tall{height:26px}
 .bedlegend{margin:26px auto 0;max-width:440px}
@@ -1536,10 +1536,14 @@ function fixLink(prop,rn){ return location.origin+location.pathname+'?fix='+enco
 /* =========================================================
    SIMBOLOGIA LETTI  (icone SVG per configurazione)
    ========================================================= */
+// Letti visti DALL'ALTO. Di lato un matrimoniale e un singolo hanno la stessa
+// sagoma e si distinguono solo dalla larghezza: su una riga di elenco, a 20
+// pixel, sembrano lo stesso disegno. Dall'alto la differenza e' il numero di
+// cuscini, che si legge subito anche piccolo.
 const BED={
-  single:`<svg class="bedic" viewBox="0 0 32 24" fill="none" stroke="var(--ink)" stroke-width="1.5"><rect x="3" y="6" width="2.4" height="13" rx="1" fill="var(--slate)" stroke="none"/><rect x="6.5" y="8.5" width="8" height="5" rx="2" fill="var(--gold-soft)"/><rect x="5.5" y="12.5" width="23" height="5" rx="2.5" fill="#fff"/><line x1="5.5" y1="18.5" x2="28.5" y2="18.5"/><rect x="6" y="19" width="2" height="3.4" rx="1" fill="var(--slate)" stroke="none"/><rect x="26" y="19" width="2" height="3.4" rx="1" fill="var(--slate)" stroke="none"/></svg>`,
-  double:`<svg class="bedic" viewBox="0 0 48 24" fill="none" stroke="var(--ink)" stroke-width="1.5"><rect x="3" y="5" width="2.4" height="14" rx="1" fill="var(--slate)" stroke="none"/><rect x="6.5" y="8" width="8.5" height="5.5" rx="2" fill="var(--gold-soft)"/><rect x="16" y="8" width="8.5" height="5.5" rx="2" fill="var(--gold-soft)"/><rect x="5.5" y="12.5" width="39" height="5.5" rx="2.5" fill="#fff"/><line x1="5.5" y1="19" x2="44.5" y2="19"/><rect x="6" y="19.5" width="2" height="3.4" rx="1" fill="var(--slate)" stroke="none"/><rect x="42" y="19.5" width="2" height="3.4" rx="1" fill="var(--slate)" stroke="none"/></svg>`,
-  bunk:`<svg class="bedic tall" viewBox="0 0 40 40" fill="none" stroke="var(--ink)" stroke-width="1.5"><rect x="6" y="4" width="2.4" height="32" rx="1" fill="var(--slate)" stroke="none"/><rect x="31.6" y="4" width="2.4" height="32" rx="1" fill="var(--slate)" stroke="none"/><rect x="10" y="5.5" width="7" height="4" rx="1.6" fill="var(--gold-soft)"/><rect x="8" y="9" width="24" height="4.6" rx="2" fill="#fff"/><rect x="10" y="23.5" width="7" height="4" rx="1.6" fill="var(--gold-soft)"/><rect x="8" y="27" width="24" height="4.6" rx="2" fill="#fff"/><line x1="34.5" y1="12" x2="37.5" y2="12"/><line x1="34.5" y1="18" x2="37.5" y2="18"/><line x1="34.5" y1="24" x2="37.5" y2="24"/><line x1="36" y1="10" x2="36" y2="30"/></svg>`,
+  single:`<svg class="bedic" viewBox="0 0 20 32" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"><rect x="2" y="2" width="16" height="28" rx="3.5" fill="#fff"/><rect x="4.6" y="4.6" width="10.8" height="6.4" rx="2.4" fill="var(--gold-soft)"/><path d="M2.8 13.6h14.4V27a3 3 0 0 1-3 3H5.8a3 3 0 0 1-3-3z" fill="var(--gold-soft)" opacity=".45"/><line x1="2.8" y1="13.6" x2="17.2" y2="13.6"/></svg>`,
+  double:`<svg class="bedic" viewBox="0 0 32 32" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"><rect x="2" y="2" width="28" height="28" rx="3.5" fill="#fff"/><rect x="4.6" y="4.6" width="10.6" height="6.4" rx="2.4" fill="var(--gold-soft)"/><rect x="16.8" y="4.6" width="10.6" height="6.4" rx="2.4" fill="var(--gold-soft)"/><path d="M2.8 13.6h26.4V27a3 3 0 0 1-3 3H5.8a3 3 0 0 1-3-3z" fill="var(--gold-soft)" opacity=".45"/><line x1="2.8" y1="13.6" x2="29.2" y2="13.6"/></svg>`,
+  bunk:`<svg class="bedic tall" viewBox="0 0 24 40" fill="none" stroke="var(--ink)" stroke-width="1.6" stroke-linejoin="round"><rect x="2" y="2" width="16" height="16" rx="2.6" fill="#fff"/><rect x="4.2" y="4" width="8" height="3.6" rx="1.4" fill="var(--gold-soft)"/><line x1="2.8" y1="9.2" x2="17.2" y2="9.2"/><rect x="2" y="22" width="16" height="16" rx="2.6" fill="#fff"/><rect x="4.2" y="24" width="8" height="3.6" rx="1.4" fill="var(--gold-soft)"/><line x1="2.8" y1="29.2" x2="17.2" y2="29.2"/><line x1="21" y1="4" x2="21" y2="36"/><line x1="18.6" y1="11" x2="23.4" y2="11"/><line x1="18.6" y1="20" x2="23.4" y2="20"/><line x1="18.6" y1="29" x2="23.4" y2="29"/></svg>`,
 };
 function parseBeds(config,type){
   const c=(config||'').toLowerCase(); let matr=0,sing=0,cast=0,m;
@@ -3745,7 +3749,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-10-22.4';
+const APP_VERSIONE='2026-10-22.5';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
