@@ -541,6 +541,10 @@ details.rec-actions.rp:not([open]) .rp-sum::after{transform:rotate(-90deg)}
 @media(max-width:780px){ .lav-grid{grid-template-columns:1fr} .lav-cart{position:static!important} }
 .lav-print{width:100%;margin-top:11px;justify-content:center}
 .co-btn{appearance:none;border:1.5px solid var(--green);background:#fff;color:var(--green);font-weight:700;cursor:pointer}
+.kg-list{margin:10px 0 2px;padding:10px 12px;background:var(--snow);border:1px solid var(--line);border-radius:10px}
+.kg-list-h{font-family:var(--display);font-weight:700;font-size:10.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-bottom:5px}
+.kg-nums{font-family:var(--display);font-weight:800;font-size:19px;letter-spacing:.04em;line-height:1.45;font-variant-numeric:tabular-nums;word-spacing:2px}
+.kg-acts{display:flex;gap:8px;margin-top:9px;flex-wrap:wrap}
 .undo-co{appearance:none;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer}
 .lav-cart{background:var(--gold-soft);border:1px solid var(--line);border-radius:14px;padding:11px 13px;position:sticky;top:80px}
 .lav-cart h3{font-family:var(--display);font-weight:700;font-size:15px;margin:0 0 7px}
@@ -771,7 +775,7 @@ const I18N={
   rooms_h:'Stato camere', rooms_lead:'{0}/{1} pronte · aggiornato dai Piani in tempo reale (in questa demo, cambiando reparto nella stessa finestra).',
   st_ready:'Pronta', st_wip:'In corso', st_todo:'Da fare', stay_short:'soggiorno', stay_dn:'Soggiorno · giorno {0} su {1}', st_fermata:'Fermata', st_partenza:'Partenza', st_dentro:'Parte oggi — ancora dentro', st_arrivo:'Arrivo', st_inpart:'In partenza', st_libera:'Libera — si può pulire', st_controllo:'Controllo', st_inwork:'In rifacimento', st_fatta:'Fatta',
   keys_h:'Programmazione chiavi', keys_lead:'{0} gruppi/nuclei · {1} stanze in arrivo · {2} chiavi da programmare. Programma insieme le chiavi dello stesso gruppo.',
-  keys_rooms:'{0} stanze · {1} chiavi · arrivo {2}', keys_prog:'Programma chiavi', keys_done:'✓ Chiavi programmate', keys_singles:'Arrivi singoli', keys_prog_s:'Programma', keys_done_s:'✓ fatto',
+  keys_rooms:'{0} stanze · {1} chiavi · arrivo {2}', keys_prog:'Programma chiavi', keys_done:'✓ Chiavi programmate', keys_singles:'Arrivi singoli', keys_group_anon:'Gruppo · {0} stanze', keys_roomlist:'Stanze del gruppo ({0})', keys_copy:'📋 Copia stanze', keys_copied:'{0} stanze copiate', keys_sign:'Consegnata a', keys_same_name:'stesso cognome', keys_prog_s:'Programma', keys_done_s:'✓ fatto',
   piani_prompt:'Digita il numero della stanza', open_room:'Apri stanza', your_rooms:'Le tue stanze di oggi', legend:'Legenda letti',
   ctrl_h:'🔎 Controllo consigliato', ctrl_txt:'Ieri questa stanza era libera. Prima dell\'arrivo, dai una controllata che sia tutto a posto e verifica la disposizione dei letti.', ctrl_chip:'🔎 controlla',
   prep_beds:'🛏 Come preparare i letti', persons:'{0} persone', att_h:'⚠️ Attenzioni', att_h2:'Attenzioni', no_alert:'Nessuna segnalazione particolare.',
@@ -816,7 +820,7 @@ const I18N={
   rooms_h:'Room status', rooms_lead:'{0}/{1} ready · updated by Housekeeping in real time (in this demo, by switching department in the same window).',
   st_ready:'Ready', st_wip:'In progress', st_todo:'To do', stay_short:'stay', stay_dn:'Stay · day {0} of {1}', st_fermata:'Stay-over', st_partenza:'Departure', st_dentro:'Leaving today — still in', st_arrivo:'Arrival', st_inpart:'Departing', st_libera:'Vacant — ready to clean', st_controllo:'Check', st_inwork:'Being cleaned', st_fatta:'Done',
   keys_h:'Key programming', keys_lead:'{0} groups/families · {1} arriving rooms · {2} keys to program. Program keys for the same group together.',
-  keys_rooms:'{0} rooms · {1} keys · arrival {2}', keys_prog:'Program keys', keys_done:'✓ Keys programmed', keys_singles:'Single arrivals', keys_prog_s:'Program', keys_done_s:'✓ done',
+  keys_rooms:'{0} rooms · {1} keys · arrival {2}', keys_prog:'Program keys', keys_done:'✓ Keys programmed', keys_singles:'Single arrivals', keys_group_anon:'Group · {0} rooms', keys_roomlist:'Group rooms ({0})', keys_copy:'📋 Copy rooms', keys_copied:'{0} rooms copied', keys_sign:'Handed to', keys_same_name:'same surname', keys_prog_s:'Program', keys_done_s:'✓ done',
   piani_prompt:'Type the room number', open_room:'Open room', your_rooms:'Your rooms today', legend:'Bed legend',
   ctrl_h:'🔎 Check recommended', ctrl_txt:'This room was empty yesterday. Before the arrival, check that everything is in order and verify the bed layout.', ctrl_chip:'🔎 check',
   prep_beds:'🛏 How to prepare the beds', persons:'{0} people', att_h:'⚠️ Alerts', att_h2:'Alerts', no_alert:'No particular alerts.',
@@ -861,7 +865,7 @@ const I18N={
   rooms_h:'Starea camerelor', rooms_lead:'{0}/{1} gata · actualizat de Cameriste în timp real (în această demo, schimbând departamentul în aceeași fereastră).',
   st_ready:'Gata', st_wip:'În curs', st_todo:'De făcut', stay_short:'sejur', stay_dn:'Sejur · ziua {0} din {1}', st_fermata:'Rămâne', st_partenza:'Plecare', st_dentro:'Pleacă azi — încă înăuntru', st_arrivo:'Sosire', st_inpart:'La plecare', st_libera:'Liberă — se poate curăța', st_controllo:'Verificare', st_inwork:'În refacere', st_fatta:'Gata',
   keys_h:'Programarea cheilor', keys_lead:'{0} grupuri/familii · {1} camere în sosire · {2} chei de programat. Programează împreună cheile aceluiași grup.',
-  keys_rooms:'{0} camere · {1} chei · sosire {2}', keys_prog:'Programează cheile', keys_done:'✓ Chei programate', keys_singles:'Sosiri individuale', keys_prog_s:'Programează', keys_done_s:'✓ gata',
+  keys_rooms:'{0} camere · {1} chei · sosire {2}', keys_prog:'Programează cheile', keys_done:'✓ Chei programate', keys_singles:'Sosiri individuale', keys_group_anon:'Grup · {0} camere', keys_roomlist:'Camerele grupului ({0})', keys_copy:'📋 Copiază camerele', keys_copied:'{0} camere copiate', keys_sign:'Predată lui', keys_same_name:'același nume', keys_prog_s:'Programează', keys_done_s:'✓ gata',
   piani_prompt:'Introdu numărul camerei', open_room:'Deschide camera', your_rooms:'Camerele tale de azi', legend:'Legenda paturilor',
   ctrl_h:'🔎 Verificare recomandată', ctrl_txt:'Ieri această cameră a fost liberă. Înainte de sosire, verifică să fie totul în ordine și controlează dispunerea paturilor.', ctrl_chip:'🔎 verifică',
   prep_beds:'🛏 Cum se pregătesc paturile', persons:'{0} persoane', att_h:'⚠️ Atenționări', att_h2:'Atenționări', no_alert:'Nicio atenționare deosebită.',
@@ -906,7 +910,7 @@ const I18N={
   rooms_h:'Statusi i dhomave', rooms_lead:'{0}/{1} gati · përditësuar nga Pastrimi në kohë reale (në këtë demo, duke ndryshuar repartin në të njëjtën dritare).',
   st_ready:'Gati', st_wip:'Në progres', st_todo:'Për t’u bërë', stay_short:'qëndrim', stay_dn:'Qëndrim · dita {0} nga {1}', st_fermata:'Qëndron', st_partenza:'Nisje', st_dentro:'Niset sot — ende brenda', st_arrivo:'Mbërritje', st_inpart:'Në nisje', st_libera:'E lirë — mund të pastrohet', st_controllo:'Kontroll', st_inwork:'Në pastrim', st_fatta:'U krye',
   keys_h:'Programimi i çelësave', keys_lead:'{0} grupe/familje · {1} dhoma në mbërritje · {2} çelësa për t’u programuar. Programo bashkë çelësat e të njëjtit grup.',
-  keys_rooms:'{0} dhoma · {1} çelësa · mbërritja {2}', keys_prog:'Programo çelësat', keys_done:'✓ Çelësat u programuan', keys_singles:'Mbërritje individuale', keys_prog_s:'Programo', keys_done_s:'✓ u krye',
+  keys_rooms:'{0} dhoma · {1} çelësa · mbërritja {2}', keys_prog:'Programo çelësat', keys_done:'✓ Çelësat u programuan', keys_singles:'Mbërritje individuale', keys_group_anon:'Grup · {0} dhoma', keys_roomlist:'Dhomat e grupit ({0})', keys_copy:'📋 Kopjo dhomat', keys_copied:'{0} dhoma u kopjuan', keys_sign:'Dorëzuar te', keys_same_name:'i njëjti mbiemër', keys_prog_s:'Programo', keys_done_s:'✓ u krye',
   piani_prompt:'Shkruaj numrin e dhomës', open_room:'Hap dhomën', your_rooms:'Dhomat e tua sot', legend:'Legjenda e shtretërve',
   ctrl_h:'🔎 Kontroll i rekomanduar', ctrl_txt:'Dje kjo dhomë ishte e lirë. Para mbërritjes, kontrollo që gjithçka të jetë në rregull dhe verifiko rregullimin e shtretërve.', ctrl_chip:'🔎 kontrollo',
   prep_beds:'🛏 Si të përgatiten shtretërit', persons:'{0} persona', att_h:'⚠️ Kujdese', att_h2:'Kujdese', no_alert:'Asnjë sinjalizim i veçantë.',
@@ -1794,9 +1798,10 @@ function viewReception(){
 }
 function viewKeys(d){
   const groups={}, singles=[];
-  d.arrivi.forEach(a=>{ if(a.group){(groups[a.group]=groups[a.group]||[]).push(a);} else singles.push(a); });
+  d.arrivi.forEach(a=>{ const k=a.gid||a.group; if(k){(groups[k]=groups[k]||[]).push(a);} else singles.push(a); });
   // gruppi con una sola stanza -> trattati come singoli
   Object.keys(groups).forEach(g=>{ if(groups[g].length<2){ singles.push(groups[g][0]); delete groups[g]; } });
+  const etichettaGruppo=k=>{ const r=groups[k]||[]; return (r[0]&&r[0].group)||k; };
   const keysOf=a=>a.pax; // 1 chiave per persona
   const gNames=Object.keys(groups);
   const totKeys=d.arrivi.reduce((s,a)=>s+keysOf(a),0);
@@ -1806,9 +1811,16 @@ function viewKeys(d){
       const rooms=groups[g].slice().sort((a,b)=>(parseInt(a.rn)||0)-(parseInt(b.rn)||0));
       const id='g:'+g; const done=!!KEYPROG[SESSION.prop][id];
       const gk=rooms.reduce((s,a)=>s+keysOf(a),0);
+      const nome=etichettaGruppo(g);
+      // L'elenco delle stanze in chiaro e in grande: e' quello che si legge
+      // mentre si programmano le chiavi una dopo l'altra, e va letto senza
+      // perdere il segno. Il resto della scheda viene dopo.
+      const elenco=rooms.map(a=>a.rn).join('  ·  ');
       return `<div class="keygroup ${done?'done':''}">
-        <div class="kg-head"><div><div class="kg-name">👪 ${g}</div><div class="kg-sub">${t('keys_rooms',rooms.length,gk,rooms[0].time)}</div></div>
-          <button class="kg-btn ${done?'on':''}" onclick="keyToggle('${id.replace(/'/g,"")}')">${done?t('keys_done'):t('keys_prog')}</button></div>
+        <div class="kg-head"><div><div class="kg-name">👪 ${nome}</div><div class="kg-sub">${t('keys_rooms',rooms.length,gk,rooms[0].time)}</div></div>
+          <button class="kg-btn ${done?'on':''}" onclick="keyToggle('${String(id).replace(/'/g,"")}')">${done?t('keys_done'):t('keys_prog')}</button></div>
+        <div class="kg-list"><div class="kg-list-h">${t('keys_roomlist',rooms.length)}${rooms.some(a=>a.unito)?' · '+t('keys_same_name'):''}</div><div class="kg-nums">${elenco}</div>
+          <div class="kg-acts"><button class="chip co-btn" onclick="copiaStanze('${String(g).replace(/'/g,"")}')">${t('keys_copy')}</button><button class="printbtn" onclick="printRooming('${String(g).replace(/'/g,"")}')">${t('pr_print')}</button></div></div>
         <div class="kg-rooms">${rooms.map(a=>`<div class="kg-room"><span class="kg-rn">${a.rn}</span><span class="kg-g">${a.guest}</span><span class="kg-keys">🔑 ${keysOf(a)}</span></div>`).join('')}</div>
       </div>`;
     }).join('');
@@ -1922,6 +1934,53 @@ function printCart(){
     ${bodyHtml}
   </body></html>`;
   printHTML(html);
+}
+// Stanze di un gruppo, in ordine: usate dalla copia e dalla stampa.
+function gruppoStanze(gid){
+  const d=DEMO[SESSION.prop]||{arrivi:[]};
+  return (d.arrivi||[]).filter(a=>String(a.gid||a.group)===String(gid))
+    .sort((a,b)=>(parseInt(a.rn)||0)-(parseInt(b.rn)||0));
+}
+function copiaStanze(gid){
+  const rr=gruppoStanze(gid); if(!rr.length) return;
+  const txt=rr.map(a=>a.rn).join(', ');
+  try{ navigator.clipboard.writeText(txt).then(function(){ waGruppoStato(t('keys_copied',rr.length)); },
+       function(){ waGruppoStato(txt); }); }
+  catch(e){ waGruppoStato(txt); }
+}
+// Rooming list da banco: le chiavi si programmano una alla volta, con il
+// foglio davanti. Niente saldi, niente note: solo stanza, nome e chiavi.
+function printRooming(gid){
+  const rr=gruppoStanze(gid); if(!rr.length) return;
+  const prop=SESSION.prop, propName=(PROPS.find(p=>p.id===prop)||{}).full||'';
+  const esc=x=>String(x==null?'':x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  const nome=rr[0].group||t('keys_group_anon',rr.length);
+  const chiavi=rr.reduce((s,a)=>s+(a.pax||0),0);
+  const righe=rr.map(a=>`<tr><td class="c-rn">${esc(a.rn)}</td><td>${esc(a.guest||'—')}</td><td>${esc(a.type||'')}</td><td class="q">${a.pax||0}</td><td class="sign"></td></tr>`).join('');
+  printHTML(`<!doctype html><html><head><meta charset="utf-8"><title>${esc(propName)} · ${esc(nome)}</title>
+  <style>
+    *{box-sizing:border-box} body{font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:#16232a;margin:28px}
+    .hd{display:flex;justify-content:space-between;align-items:flex-end;border-bottom:3px solid #16232a;padding-bottom:10px}
+    .brand{font-weight:800;font-size:22px} .prop{font-size:13px;color:#5b6b73;margin-top:2px}
+    .ttl{text-align:right} .ttl h1{margin:0;font-size:19px} .ttl .dt{font-size:12px;color:#5b6b73}
+    .nums{margin:14px 0 6px;font-size:22px;font-weight:800;letter-spacing:.06em;font-variant-numeric:tabular-nums;line-height:1.5}
+    .sub{font-size:13px;color:#5b6b73;margin-bottom:12px}
+    table{width:100%;border-collapse:collapse;font-size:13px}
+    th{background:#f3efe7;text-align:left;padding:8px 9px;border-bottom:2px solid #d8cfbf;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:#5b6b73}
+    td{padding:10px 9px;border-bottom:1px solid #e7e1d5}
+    .c-rn{font-weight:800;width:52px;font-size:16px} .q{text-align:right;width:60px}
+    .sign{width:140px;border-bottom:1px solid #e7e1d5}
+    tr:nth-child(even) td{background:#faf8f3}
+    .ft{margin-top:16px;font-size:11px;color:#8a8676}
+    @media print{ body{margin:12mm} }
+  </style></head><body>
+    <div class="hd"><div><div class="brand">AlpStay</div><div class="prop">${esc(propName)}</div></div>
+      <div class="ttl"><h1>👪 ${esc(nome)}</h1><div class="dt">${esc(giornoEtichetta(0,true))}</div></div></div>
+    <div class="sub">${esc(t('keys_rooms',rr.length,chiavi,rr[0].time||''))}</div>
+    <div class="nums">${esc(rr.map(a=>a.rn).join('  ·  '))}</div>
+    <table><thead><tr><th>#</th><th>${esc(t('th_name'))}</th><th>${esc(t('th_type'))}</th><th class="q">🔑</th><th>${esc(t('keys_sign'))}</th></tr></thead><tbody>${righe}</tbody></table>
+    <div class="ft">${esc(t('pr_printed'))} ${esc((new Date()).toLocaleString())} — AlpStay</div>
+  </body></html>`);
 }
 function keyToggle(id){ KEYPROG[SESSION.prop][id]=!KEYPROG[SESSION.prop][id]; if(KEYPROG[SESSION.prop][id]){ const label=id.startsWith('g:')?t('tk_group',id.slice(2)):t('tk_room_l',id.slice(2)); pushTicker(SESSION.prop,'ready','tk_keys',[label]); } renderModule(); }
 function setRecTab(t){ RECTAB=t; renderModule(); }
@@ -2795,10 +2854,42 @@ function slopeDeriveFor(prop,dayISO){
   const canale=r=>r.channel==='Channel manager'?(r.agency||'OTA'):r.channel;
   const srcArr=r=>canale(r);
   const srcDep=r=>[canale(r),r.tax?t('slope_tax',r.tax.toFixed(2)):''].filter(Boolean).join(' · ');
+  // GRUPPI — in Slope piu' stanze prenotate insieme condividono l'ordine.
+  // E' l'unico legame certo: il cognome si ripete per caso e l'email quasi
+  // nessuno ce l'ha. Un ordine con piu' stanze in arrivo lo stesso giorno e'
+  // un gruppo, e la reception deve programmare le chiavi tutte insieme.
+  const perOrdine={};
+  res.forEach(r=>{ if(r.cin===dayISO&&r.orderId) (perOrdine[r.orderId]=perOrdine[r.orderId]||[]).push(r); });
+  const cognomeDi=rr=>{ const g=(rr.find(x=>x.guest&&x.guest!=='—')||{}).guest||''; return g?String(g).split(/\s+/)[0]:''; };
+  // Due ordini distinti con lo stesso cognome e lo stesso giorno di arrivo
+  // sono la stessa famiglia: i genitori prenotano la loro camera e poi, a
+  // parte, quella dei figli. Si uniscono sotto l'ordine piu' grande.
+  const capo={}, perCognome={};
+  Object.keys(perOrdine).forEach(o=>{
+    const c=cognomeDi(perOrdine[o]);
+    if(c&&c.length>=3){ (perCognome[c.toLowerCase()]=perCognome[c.toLowerCase()]||[]).push(o); }
+    capo[o]=o;
+  });
+  Object.keys(perCognome).forEach(c=>{
+    const ordini=perCognome[c]; if(ordini.length<2) return;
+    const principale=ordini.slice().sort((a,b)=>perOrdine[b].length-perOrdine[a].length)[0];
+    ordini.forEach(o=>{ capo[o]=principale; });
+  });
+  const membri={};
+  Object.keys(perOrdine).forEach(o=>{ (membri[capo[o]]=membri[capo[o]]||[]).push(...perOrdine[o]); });
+  // Gruppo = piu' di una stanza. Anche solo due: la camera dei genitori e
+  // quella dei figli sono gia' un gruppo, e le chiavi si fanno insieme.
+  const etichette={};
+  Object.keys(membri).forEach(o=>{ if(membri[o].length>1) etichette[o]=cognomeDi(membri[o]); });
+
   const arrivi=[],partenze=[],soggiorno=[];
   res.forEach(r=>{
     const base={rn:r.rn,guest:r.guest,type:r.type,pax:r.pax,nights:r.nights,note:srcArr(r)};
-    if(r.cin===dayISO) arrivi.push(Object.assign({},base,{time:''}));
+    if(r.cin===dayISO) arrivi.push(Object.assign({},base,{time:'',
+      gid:(r.orderId&&etichette[capo[r.orderId]]!==undefined)?capo[r.orderId]:'',
+      unito:!!(r.orderId&&capo[r.orderId]&&capo[r.orderId]!==r.orderId),
+      group:(r.orderId&&etichette[capo[r.orderId]]!==undefined)
+        ? (etichette[capo[r.orderId]]||t('keys_group_anon',membri[capo[r.orderId]].length)) : (r.group||'')}));
     else if(r.cout===dayISO){
       // Vale la prima delle due che si sa: lo stato della Scatola oppure
       // l'uscita battuta in reception, che di solito arriva molto prima.
@@ -3536,6 +3627,7 @@ async function scatolaCarica(refresh){
         const cin=String(r.arrival||''), cout=String(r.departure||'');
         righe.push({
           rn:rn, guest:(r.guest?String(r.guest):'—'), type:scatolaTipo(prop,rn),
+          resId:String(r.reservation_id||''), orderId:String(r.order_id||''),
           adults:Number(r.adults)||0, children:Number(r.children)||0,
           pax:(Number(r.adults)||0)+(Number(r.children)||0),
           cin:cin, cout:cout, nights:scatolaNotti(cin,cout),
@@ -3653,7 +3745,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-10-22.1';
+const APP_VERSIONE='2026-10-22.2';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
@@ -3773,6 +3865,7 @@ function scatolaApplicaDati(dati,fonte){
         const cin=String(x.cin||''), cout=String(x.cout||'');
         righe.push({
           rn:rn, guest:(x.guest?String(x.guest):'—'), type:scatolaTipo(prop,rn),
+          resId:String(x.resId||''), orderId:String(x.orderId||''),
           adults:Number(x.adults)||0, children:Number(x.children)||0,
           pax:(Number(x.adults)||0)+(Number(x.children)||0),
           cin:cin, cout:cout, nights:scatolaNotti(cin,cout),
