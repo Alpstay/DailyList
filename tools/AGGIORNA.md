@@ -57,28 +57,40 @@ cifrare NON è in questo repository (è pubblico): viene data nel testo dell'att
    check-in. Le prenotazioni future restano quasi tutte senza nome: e' normale, non
    e' un errore, e il costruttore lo dice nella riga RIEPILOGO.
 
-3. **Costruzione**, dalla cartella del repository:
+3. **Letti**: `query_curated_view` sulla vista `curated_beds_daily` con
+   - `property_id in [i tre id]`
+   - `departure gte G`
+   - `arrival lte G+30`
+   - `booking_status neq CANCELLED`
+   - `order_by arrival asc`, `limit 500`
+
+   È la disposizione dei letti: decide la biancheria da preparare e il controllo
+   prima dell'arrivo. Vale lo stesso trucco dell'ordine inverso per la coda. Le
+   prenotazioni senza righe letto in Slope restano senza: è normale.
+
+4. **Costruzione**, dalla cartella del repository:
 
    ```
-   python3 tools/costruisci.py "<CHIAVE>" scatola.json "soggiorni1.txt,soggiorni2.txt,..." "intestatari1.txt,intestatari2.txt,..."
+   python3 tools/costruisci.py "<CHIAVE>" scatola.json "soggiorni1.txt,..." "intestatari1.txt,..." "letti1.txt,..."
    ```
 
    Legge le righe `RIEPILOGO` su stderr: il totale deve coincidere con `page.total`.
    Se manca il modulo `cryptography`, installalo con
    `pip install --break-system-packages cryptography`.
 
-4. **Verifica**:
+5. **Verifica**:
 
    ```
    python3 tools/verifica.py "<CHIAVE>" scatola.json
    ```
 
-   Deve finire con `verifica OK`. Controlla fra l'altro che i soggiorni non siano
-   finiti in chiaro, che ci siano movimenti per oggi e che i dati di La Scatola non
-   siano vecchi di più di tre ore — un file appena scritto può comunque contenere
+   Deve finire con `verifica OK`. Controlla fra l'altro che i soggiorni e i nomi non
+   siano finiti in chiaro, che nessuna camera risulti con più di 8 posti letto
+   (segno che le pagine dei letti sono state contate due volte), che ci siano
+   movimenti per oggi e che i dati di La Scatola non siano vecchi di più di tre ore — un file appena scritto può comunque contenere
    risposte lette molto prima.
 
-5. **Pubblicazione**: `git add scatola.json`, commit `Dati La Scatola <AAAA-MM-GG HH:MM>`,
+6. **Pubblicazione**: `git add scatola.json`, commit `Dati La Scatola <AAAA-MM-GG HH:MM>`,
    `git push origin HEAD:main`. Poi controlla con `git log origin/main -1` che il
    commit sia arrivato.
 

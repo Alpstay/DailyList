@@ -9,13 +9,18 @@ alla pagina per accendere il semaforo prima ancora di decifrare.
 
 Uso:
   python3 tools/costruisci.py CHIAVE uscita.json soggiorni1.txt[,soggiorni2.txt,...] \
-                              [intestatari1.txt,intestatari2.txt,...]
+                              [intestatari1.txt,...] [letti1.txt,...]
 
 Il terzo argomento sono le pagine di `curated_operational_stays`. Il quarto,
 facoltativo, le pagine di `curated_guest_stays`: servono solo a prendere il
 NOME DELL'INTESTATARIO, perche' la reception riconosce una prenotazione dal
 nome, non dall'identificativo. Il nome finisce dentro la parte cifrata e mai
 nei dati di servizio in chiaro.
+
+Il quinto, pure facoltativo, le pagine di `curated_beds_daily`: la
+disposizione dei letti, che decide la biancheria da preparare e il controllo
+prima dell'arrivo. Fino a ottobre non esisteva e si tirava a indovinare dalla
+tipologia di camera.
 
 Ogni pagina e' la risposta grezza di La Scatola, cosi' come il sistema l'ha
 salvata su file: {"data":[...], "freshness":{...}, "page":{...}}.
@@ -97,6 +102,68 @@ def intestatari(percorsi):
     return nomi
 
 
+# I nomi che Slope da' ai letti, tradotti nelle parole che la piattaforma gia'
+# capisce: il calcolo della biancheria legge "matrimoniale", "singolo" e
+# "a castello". KING e QUEEN sono matrimoniali a tutti gli effetti; il divano
+# letto conta come un singolo, ma si scrive, perche' chi rifa' la stanza deve
+# sapere che va aperto.
+LETTI = {
+    'DOUBLE': ('matrimoniale', 'matrimoniali'),
+    'KING':   ('matrimoniale', 'matrimoniali'),
+    'QUEEN':  ('matrimoniale', 'matrimoniali'),
+    'SINGLE': ('singolo', 'singoli'),
+    'SOFA':   ('singolo (divano letto)', 'singoli (divani letto)'),
+    'BUNK':   ('a castello', 'a castello'),
+}
+ORDINE_LETTI = ['DOUBLE', 'KING', 'QUEEN', 'SINGLE', 'SOFA', 'BUNK']
+
+
+def disposizione(percorsi):
+    """reservation_id -> "1 matrimoniale + 1 singolo"."""
+    conta = {}
+    for p in percorsi:
+        if not p:
+            continue
+        d = json.load(open(p, encoding='utf-8'))
+        for r in (d.get('data') or []):
+            res = str(r.get('reservation_id') or '')
+            if not UUID.fullmatch(res):
+                continue
+            tipo = str(r.get('bed_type') or '').upper()
+            try:
+                q = int(r.get('quantity') or 0)
+            except (TypeError, ValueError):
+                q = 0
+            if not tipo or q <= 0:
+                continue
+            conta.setdefault(res, {})
+            if tipo in conta[res]:
+                if conta[res][tipo] != q:
+                    print('ATTENZIONE: quantita\' discordi per %s %s (%d vs %d), tengo la prima'
+                          % (res, tipo, conta[res][tipo], q), file=sys.stderr)
+                continue
+            conta[res][tipo] = q
+    fuori, out = set(), {}
+    for res, m in conta.items():
+        pezzi = []
+        for tipo in ORDINE_LETTI + [k for k in sorted(m) if k not in ORDINE_LETTI]:
+            q = m.get(tipo)
+            if not q:
+                continue
+            if tipo in LETTI:
+                uno, molti = LETTI[tipo]
+                pezzi.append('%d %s' % (q, uno if q == 1 else molti))
+            else:
+                fuori.add(tipo)
+                pezzi.append('%d %s' % (q, tipo.lower()))
+        if pezzi:
+            out[res] = ' + '.join(pezzi)
+    for tipo in sorted(fuori):
+        print("ATTENZIONE: tipo di letto sconosciuto %r, scritto com'e'" % tipo,
+              file=sys.stderr)
+    return out
+
+
 def cifra(payload, chiave, contesto):
     """AES-GCM con chiave derivata dalla password, stesso schema delle altre
     app AlpStay. `contesto` entra come dato autenticato: un file rimesso in
@@ -115,6 +182,7 @@ def main():
         raise SystemExit(__doc__)
     chiave, uscita, percorsi = sys.argv[1], sys.argv[2], sys.argv[3].split(',')
     nomi = intestatari(sys.argv[4].split(',')) if len(sys.argv) > 4 else {}
+    letti = disposizione(sys.argv[5].split(',')) if len(sys.argv) > 5 else {}
     if len(chiave) < 12:
         raise SystemExit('chiave troppo corta: servono almeno 12 caratteri')
 
@@ -135,6 +203,9 @@ def main():
             nome = nomi.get(x['resId'])
             if nome:
                 x['guest'] = nome
+            cfg = letti.get(x['resId'])
+            if cfg:
+                x['letti'] = cfg
             strutture[chiave_prop]['soggiorni'].append(x)
         pag = d.get('page') or {}
         if attesi is None:
@@ -162,8 +233,9 @@ def main():
         json.dump(out, f, ensure_ascii=False, separators=(',', ':'))
 
     con_nome = sum(1 for s in strutture.values() for x in s['soggiorni'] if x.get('guest'))
-    print('RIEPILOGO %s: %d soggiorni (attesi %s) · %d con intestatario · incompleta=%s · %d byte'
-          % (uscita, totale, attesi, con_nome, incompleta, os.path.getsize(uscita)), file=sys.stderr)
+    con_letti = sum(1 for s in strutture.values() for x in s['soggiorni'] if x.get('letti'))
+    print('RIEPILOGO %s: %d soggiorni (attesi %s) · %d con intestatario · %d con letti · incompleta=%s · %d byte'
+          % (uscita, totale, attesi, con_nome, con_letti, incompleta, os.path.getsize(uscita)), file=sys.stderr)
     for k, s in strutture.items():
         arr = sum(1 for x in s['soggiorni'] if x['cin'] == giorno)
         par = sum(1 for x in s['soggiorni'] if x['cout'] == giorno)

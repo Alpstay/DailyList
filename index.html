@@ -1770,7 +1770,7 @@ function viewReception(){
     inner=`<div class="sec-row"><h2 class="sec">${t(RECDAY===0?'arr_h':'arr_h_day')}</h2><button class="printbtn" onclick="printList('arrivi')">${t('pr_print')}</button></div>${recDateBar()}`+
       (arrDay.length?arrDay.map(a=>{
         const st=roomStatus(a.rn);
-        return `<div class="movecard"><div class="rn">${a.rn}</div><div class="body"><div class="guest">${vXXX(a.guest,"Nominativo dell'ospite: non incluso nell'importazione dalla Scatola")}</div><div class="meta">${a.type} · ${a.pax} ${t('pax')}</div><div style="margin:7px 0 2px">${bedIcons(a.config,a.type,'sm')} <span style="font-size:12px;color:var(--muted);font-weight:600">${a.config?bedName(a.config,a.type):XXX('Configurazione letti: La Scatola non la espone (reservation_bed non interrogabile)')+' '+bedName(a.config,a.type)}</span></div><div class="chips">${attChips(arrAtts(a))||(a.scatola||!a.note?XXX('Tag e note di prenotazione: non esposti da La Scatola'):'<span class="chip">'+t('no_att')+'</span>')}</div>${balconyAlert(SESSION.prop,a)?'<div class="bal-alert">🪟 '+t('bal_alert')+'</div>':''}${a.note?`<div class="movenote">📝 ${a.note}</div>`:''}</div><div class="right"><div class="time">${a.time}</div><div style="margin-top:8px">${statusPill(st,a.rn)}</div></div></div>`;
+        return `<div class="movecard"><div class="rn">${a.rn}</div><div class="body"><div class="guest">${vXXX(a.guest,"Nominativo dell'ospite: non incluso nell'importazione dalla Scatola")}</div><div class="meta">${a.type} · ${a.pax} ${t('pax')}</div><div style="margin:7px 0 2px">${bedIcons(a.config,a.type,'sm')} <span style="font-size:12px;color:var(--muted);font-weight:600">${a.config?bedName(a.config,a.type):XXX('Disposizione letti non indicata su questa prenotazione in Slope')+' '+bedName(a.config,a.type)}</span></div><div class="chips">${attChips(arrAtts(a))||(a.scatola||!a.note?XXX('Tag e note di prenotazione: non esposti da La Scatola'):'<span class="chip">'+t('no_att')+'</span>')}</div>${balconyAlert(SESSION.prop,a)?'<div class="bal-alert">🪟 '+t('bal_alert')+'</div>':''}${a.note?`<div class="movenote">📝 ${a.note}</div>`:''}</div><div class="right"><div class="time">${a.time}</div><div style="margin-top:8px">${statusPill(st,a.rn)}</div></div></div>`;
       }).join(''):`<div class="empty">${t('none_arr')}</div>`);
   } else if(RECTAB==='partenze'){
     inner=`<div class="sec-row"><h2 class="sec">${t(RECDAY===0?'dep_h':'dep_h_day')}</h2><button class="printbtn" onclick="printList('partenze')">${t('pr_print')}</button></div>${recDateBar()}`+
@@ -2884,7 +2884,7 @@ function slopeDeriveFor(prop,dayISO){
 
   const arrivi=[],partenze=[],soggiorno=[];
   res.forEach(r=>{
-    const base={rn:r.rn,guest:r.guest,type:r.type,pax:r.pax,nights:r.nights,note:srcArr(r)};
+    const base={rn:r.rn,guest:r.guest,type:r.type,pax:r.pax,nights:r.nights,config:r.config||'',note:srcArr(r)};
     if(r.cin===dayISO) arrivi.push(Object.assign({},base,{time:'',
       gid:(r.orderId&&etichette[capo[r.orderId]]!==undefined)?capo[r.orderId]:'',
       unito:!!(r.orderId&&capo[r.orderId]&&capo[r.orderId]!==r.orderId),
@@ -3745,7 +3745,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-10-22.2';
+const APP_VERSIONE='2026-10-22.4';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
@@ -3866,6 +3866,9 @@ function scatolaApplicaDati(dati,fonte){
         righe.push({
           rn:rn, guest:(x.guest?String(x.guest):'—'), type:scatolaTipo(prop,rn),
           resId:String(x.resId||''), orderId:String(x.orderId||''),
+          // Disposizione letti: La Scatola la espone da ottobre. Prima si
+          // deduceva dalla tipologia di camera, cioe' si tirava a indovinare.
+          config:String(x.letti||''),
           adults:Number(x.adults)||0, children:Number(x.children)||0,
           pax:(Number(x.adults)||0)+(Number(x.children)||0),
           cin:cin, cout:cout, nights:scatolaNotti(cin,cout),
@@ -4006,7 +4009,7 @@ function forecast(n){
     if(res.length){
       // dati veri da Slope: gli arrivi del giorno sono quelli con quella data di arrivo
       const iso=isoLocal(dt);
-      days.push({date:dt,list:res.filter(r=>r.cin===iso).map(r=>({rn:r.rn,guest:r.guest,type:r.type,nights:r.nights,pax:r.pax}))});
+      days.push({date:dt,list:res.filter(r=>r.cin===iso).map(r=>({rn:r.rn,guest:r.guest,type:r.type,nights:r.nights,pax:r.pax,config:r.config||''}))});
     } else {
       const base=DEMO[prop].arrivi;
       const n=Math.max(1, base.length-(i%3));   // variazione demo del numero arrivi

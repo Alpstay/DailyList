@@ -98,6 +98,17 @@ def main():
                 guasto('%s: date incoerenti su camera %r' % (nome, x.get('rn')))
             if x.get('stato') not in STATI:
                 guasto('%s: stato sconosciuto %r' % (nome, x.get('stato')))
+            # Letti: un errore facile e' contare due volte le pagine che si
+            # sovrappongono, e allora la lavanderia prepara il doppio della
+            # biancheria. Nessuna camera di queste case dorme piu' di 8.
+            if x.get('letti'):
+                posti = 0
+                for q, parola in re.findall(r'(\d+)\s+([a-z]+)', x['letti']):
+                    n = int(q)
+                    posti += n * (2 if parola.startswith(('matrimonial', 'castell')) else 1)
+                if posti > 8:
+                    guasto('%s: camera %r con %d posti letto (%s): pagine contate due volte?'
+                           % (nome, x.get('rn'), posti, x['letti']))
             if x['cin'] == oggi or x['cout'] == oggi or x['cin'] < oggi < x['cout']:
                 righe_oggi += 1
 
