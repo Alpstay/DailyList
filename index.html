@@ -540,6 +540,8 @@ details.rec-actions.rp:not([open]) .rp-sum::after{transform:rotate(-90deg)}
 .lav-grid{display:grid;grid-template-columns:280px 1fr;gap:20px;align-items:start}
 @media(max-width:780px){ .lav-grid{grid-template-columns:1fr} .lav-cart{position:static!important} }
 .lav-print{width:100%;margin-top:11px;justify-content:center}
+.co-btn{appearance:none;border:1.5px solid var(--green);background:#fff;color:var(--green);font-weight:700;cursor:pointer}
+.undo-co{appearance:none;border:1px solid var(--line);background:#fff;color:var(--muted);cursor:pointer}
 .lav-cart{background:var(--gold-soft);border:1px solid var(--line);border-radius:14px;padding:11px 13px;position:sticky;top:80px}
 .lav-cart h3{font-family:var(--display);font-weight:700;font-size:15px;margin:0 0 7px}
 .lav-cart table{width:100%;border-collapse:collapse}
@@ -765,7 +767,7 @@ const I18N={
   tab_arr:'Arrivi', tab_dep:'Partenze', tab_rooms:'Stato camere', tab_dash:'Dashboard', tab_keys:'Chiavi', rd_today:'Oggi', rd_tomorrow:'Domani', rd_yesterday:'Ieri',
   arr_h:'Arrivi di oggi', arr_h_day:'Arrivi', arr_lead:'Chi si presenta al banco, con letti e attenzioni.', pax:'pax', no_att:'nessuna attenzione',
   dep_h:'Partenze di oggi', dep_h_day:'Partenze', dep_lead:'Stanze che si liberano. Il check-out effettivo arriverà da Slope.',
-  co_done:'✓ check-out effettuato', co_todo:'in partenza · check-out da fare', co_unknown:'in partenza · check-out non rilevabile', co_do:'Registra check-out', none_arr:'Nessun arrivo.', none_dep:'Nessuna partenza.', pr_print:'🖨 Stampa', pr_note:'Note e promemoria', pr_balance:'Saldo aperto', pr_status:'Stato', pr_paid:'saldato', pr_printed:'Stampato il', pr_none:'—', pr_cart_title:'Biancheria da preparare per domani', pr_totals:'Totale da caricare sul carrello', pr_cfg_tbd:'Da verificare', pr_lav_all:'Totale dei giorni scelti', pr_reason:'Motivo', pr_arr:'Arrivo',
+  co_done:'✓ check-out effettuato', co_todo:'in partenza · check-out da fare', co_mark:'✓ Segna uscito', co_undo:'annulla', co_unknown:'in partenza · check-out non rilevabile', co_do:'Registra check-out', none_arr:'Nessun arrivo.', none_dep:'Nessuna partenza.', pr_print:'🖨 Stampa', pr_note:'Note e promemoria', pr_balance:'Saldo aperto', pr_status:'Stato', pr_paid:'saldato', pr_printed:'Stampato il', pr_none:'—', pr_cart_title:'Biancheria da preparare per domani', pr_totals:'Totale da caricare sul carrello', pr_cfg_tbd:'Da verificare', pr_lav_all:'Totale dei giorni scelti', pr_reason:'Motivo', pr_arr:'Arrivo',
   rooms_h:'Stato camere', rooms_lead:'{0}/{1} pronte · aggiornato dai Piani in tempo reale (in questa demo, cambiando reparto nella stessa finestra).',
   st_ready:'Pronta', st_wip:'In corso', st_todo:'Da fare', stay_short:'soggiorno', stay_dn:'Soggiorno · giorno {0} su {1}', st_fermata:'Fermata', st_partenza:'Partenza', st_dentro:'Parte oggi — ancora dentro', st_arrivo:'Arrivo', st_inpart:'In partenza', st_libera:'Libera — si può pulire', st_controllo:'Controllo', st_inwork:'In rifacimento', st_fatta:'Fatta',
   keys_h:'Programmazione chiavi', keys_lead:'{0} gruppi/nuclei · {1} stanze in arrivo · {2} chiavi da programmare. Programma insieme le chiavi dello stesso gruppo.',
@@ -810,7 +812,7 @@ const I18N={
   tab_arr:'Arrivals', tab_dep:'Departures', tab_rooms:'Room status', tab_dash:'Dashboard', tab_keys:'Keys', rd_today:'Today', rd_tomorrow:'Tomorrow', rd_yesterday:'Yesterday',
   arr_h:'Today’s arrivals', arr_h_day:'Arrivals', arr_lead:'Who shows up at the desk, with beds and alerts.', pax:'pax', no_att:'no alerts',
   dep_h:'Today’s departures', dep_h_day:'Departures', dep_lead:'Rooms being freed. The actual check-out will come from Slope.',
-  co_done:'✓ checked out', co_todo:'leaving · check-out pending', co_unknown:'leaving · check-out status unknown', co_do:'Register check-out', none_arr:'No arrivals.', none_dep:'No departures.', pr_print:'🖨 Print', pr_note:'Notes & reminders', pr_balance:'Open balance', pr_status:'Status', pr_paid:'paid', pr_printed:'Printed on', pr_none:'—', pr_cart_title:'Linen to prepare for tomorrow', pr_totals:'Total to load on the cart', pr_cfg_tbd:'To be checked', pr_lav_all:'Total for the selected days', pr_reason:'Reason', pr_arr:'Arrival',
+  co_done:'✓ checked out', co_todo:'leaving · check-out pending', co_mark:'✓ Mark as left', co_undo:'undo', co_unknown:'leaving · check-out status unknown', co_do:'Register check-out', none_arr:'No arrivals.', none_dep:'No departures.', pr_print:'🖨 Print', pr_note:'Notes & reminders', pr_balance:'Open balance', pr_status:'Status', pr_paid:'paid', pr_printed:'Printed on', pr_none:'—', pr_cart_title:'Linen to prepare for tomorrow', pr_totals:'Total to load on the cart', pr_cfg_tbd:'To be checked', pr_lav_all:'Total for the selected days', pr_reason:'Reason', pr_arr:'Arrival',
   rooms_h:'Room status', rooms_lead:'{0}/{1} ready · updated by Housekeeping in real time (in this demo, by switching department in the same window).',
   st_ready:'Ready', st_wip:'In progress', st_todo:'To do', stay_short:'stay', stay_dn:'Stay · day {0} of {1}', st_fermata:'Stay-over', st_partenza:'Departure', st_dentro:'Leaving today — still in', st_arrivo:'Arrival', st_inpart:'Departing', st_libera:'Vacant — ready to clean', st_controllo:'Check', st_inwork:'Being cleaned', st_fatta:'Done',
   keys_h:'Key programming', keys_lead:'{0} groups/families · {1} arriving rooms · {2} keys to program. Program keys for the same group together.',
@@ -855,7 +857,7 @@ const I18N={
   tab_arr:'Sosiri', tab_dep:'Plecări', tab_rooms:'Starea camerelor', tab_dash:'Panou', tab_keys:'Chei', rd_today:'Azi', rd_tomorrow:'Mâine', rd_yesterday:'Ieri',
   arr_h:'Sosirile de azi', arr_h_day:'Sosiri', arr_lead:'Cine se prezintă la recepție, cu paturi și atenționări.', pax:'pers.', no_att:'nicio atenționare',
   dep_h:'Plecările de azi', dep_h_day:'Plecări', dep_lead:'Camere care se eliberează. Check-out-ul efectiv va veni din Slope.',
-  co_done:'✓ check-out efectuat', co_todo:'la plecare · check-out de făcut', co_unknown:'la plecare · stare check-out necunoscută', co_do:'Înregistrează check-out', none_arr:'Nicio sosire.', none_dep:'Nicio plecare.', pr_print:'🖨 Tipărește', pr_note:'Note și memento', pr_balance:'Sold deschis', pr_status:'Stare', pr_paid:'achitat', pr_printed:'Tipărit la', pr_none:'—', pr_cart_title:'Lenjerie de pregătit pentru mâine', pr_totals:'Total de încărcat pe cărucior', pr_cfg_tbd:'De verificat', pr_lav_all:'Total pentru zilele alese', pr_reason:'Motiv', pr_arr:'Sosire',
+  co_done:'✓ check-out efectuat', co_todo:'la plecare · check-out de făcut', co_mark:'✓ Marchează ieșit', co_undo:'anulează', co_unknown:'la plecare · stare check-out necunoscută', co_do:'Înregistrează check-out', none_arr:'Nicio sosire.', none_dep:'Nicio plecare.', pr_print:'🖨 Tipărește', pr_note:'Note și memento', pr_balance:'Sold deschis', pr_status:'Stare', pr_paid:'achitat', pr_printed:'Tipărit la', pr_none:'—', pr_cart_title:'Lenjerie de pregătit pentru mâine', pr_totals:'Total de încărcat pe cărucior', pr_cfg_tbd:'De verificat', pr_lav_all:'Total pentru zilele alese', pr_reason:'Motiv', pr_arr:'Sosire',
   rooms_h:'Starea camerelor', rooms_lead:'{0}/{1} gata · actualizat de Cameriste în timp real (în această demo, schimbând departamentul în aceeași fereastră).',
   st_ready:'Gata', st_wip:'În curs', st_todo:'De făcut', stay_short:'sejur', stay_dn:'Sejur · ziua {0} din {1}', st_fermata:'Rămâne', st_partenza:'Plecare', st_dentro:'Pleacă azi — încă înăuntru', st_arrivo:'Sosire', st_inpart:'La plecare', st_libera:'Liberă — se poate curăța', st_controllo:'Verificare', st_inwork:'În refacere', st_fatta:'Gata',
   keys_h:'Programarea cheilor', keys_lead:'{0} grupuri/familii · {1} camere în sosire · {2} chei de programat. Programează împreună cheile aceluiași grup.',
@@ -900,7 +902,7 @@ const I18N={
   tab_arr:'Mbërritje', tab_dep:'Nisje', tab_rooms:'Statusi i dhomave', tab_dash:'Paneli', tab_keys:'Çelësat', rd_today:'Sot', rd_tomorrow:'Nesër', rd_yesterday:'Dje',
   arr_h:'Mbërritjet e sotme', arr_h_day:'Mbërritje', arr_lead:'Kush paraqitet në banak, me shtretër dhe kujdese.', pax:'pers.', no_att:'asnjë kujdes',
   dep_h:'Nisjet e sotme', dep_h_day:'Nisje', dep_lead:'Dhoma që lirohen. Check-out-i aktual do të vijë nga Slope.',
-  co_done:'✓ dalje e kryer', co_todo:'në nisje · check-out për t’u bërë', co_unknown:'në nisje · statusi i daljes i panjohur', co_do:'Regjistro check-out', none_arr:'Asnjë mbërritje.', none_dep:'Asnjë nisje.', pr_print:'🖨 Printo', pr_note:'Shënime & kujtesa', pr_balance:'Balancë e hapur', pr_status:'Statusi', pr_paid:'e paguar', pr_printed:'Printuar më', pr_none:'—', pr_cart_title:'Lino për të përgatitur për nesër', pr_totals:'Totali për të ngarkuar në karrocë', pr_cfg_tbd:'Për t’u verifikuar', pr_lav_all:'Totali i ditëve të zgjedhura', pr_reason:'Arsyeja', pr_arr:'Mbërritje',
+  co_done:'✓ dalje e kryer', co_todo:'në nisje · check-out për t’u bërë', co_mark:'✓ Shëno si i dalë', co_undo:'anulo', co_unknown:'në nisje · statusi i daljes i panjohur', co_do:'Regjistro check-out', none_arr:'Asnjë mbërritje.', none_dep:'Asnjë nisje.', pr_print:'🖨 Printo', pr_note:'Shënime & kujtesa', pr_balance:'Balancë e hapur', pr_status:'Statusi', pr_paid:'e paguar', pr_printed:'Printuar më', pr_none:'—', pr_cart_title:'Lino për të përgatitur për nesër', pr_totals:'Totali për të ngarkuar në karrocë', pr_cfg_tbd:'Për t’u verifikuar', pr_lav_all:'Totali i ditëve të zgjedhura', pr_reason:'Arsyeja', pr_arr:'Mbërritje',
   rooms_h:'Statusi i dhomave', rooms_lead:'{0}/{1} gati · përditësuar nga Pastrimi në kohë reale (në këtë demo, duke ndryshuar repartin në të njëjtën dritare).',
   st_ready:'Gati', st_wip:'Në progres', st_todo:'Për t’u bërë', stay_short:'qëndrim', stay_dn:'Qëndrim · dita {0} nga {1}', st_fermata:'Qëndron', st_partenza:'Nisje', st_dentro:'Niset sot — ende brenda', st_arrivo:'Mbërritje', st_inpart:'Në nisje', st_libera:'E lirë — mund të pastrohet', st_controllo:'Kontroll', st_inwork:'Në pastrim', st_fatta:'U krye',
   keys_h:'Programimi i çelësave', keys_lead:'{0} grupe/familje · {1} dhoma në mbërritje · {2} çelësa për t’u programuar. Programo bashkë çelësat e të njëjtit grup.',
@@ -1505,6 +1507,9 @@ function initFirebase(){ try{ if(!firebaseApp())return false; fdb=firebase.datab
   fdb.ref('planningdone').on('value',snap=>{ const v=snap.val()||{}; PLANNING_DONE={saslong:v.saslong||{},hartmann:v.hartmann||{},acadia:v.acadia||{}}; if(SESSION.role)renderModule(); });
   // "Stanza pronta": lo scrive chi è ai piani, lo deve vedere la reception.
   fdb.ref('roomstatus').on('value',snap=>{ ROOMSTATUS=roomStatusPulisci(snap.val()||{}); LS.set('abo_roomstatus',ROOMSTATUS); if(SESSION.role)renderModule(); });
+  // Uscite battute in reception: devono arrivare ai piani in pochi secondi.
+  fdb.ref('uscite').on('value',snap=>{ USCITE=uscitePulisci(snap.val()||{}); LS.set('abo_uscite',USCITE);
+    rinfrescaElenchi(); if(SESSION.role)renderModule(); });
   // Anagrafica stanze e collaboratori: condivise tra i dispositivi. Se il database è ancora vuoto su questi
   // percorsi (primo collegamento), lo si "semina" con i dati locali attuali; da quel momento chi modifica da
   // un dispositivo (es. Backoffice) aggiorna tutti gli altri.
@@ -1765,7 +1770,7 @@ function viewReception(){
       }).join(''):`<div class="empty">${t('none_arr')}</div>`);
   } else if(RECTAB==='partenze'){
     inner=`<div class="sec-row"><h2 class="sec">${t(RECDAY===0?'dep_h':'dep_h_day')}</h2><button class="printbtn" onclick="printList('partenze')">${t('pr_print')}</button></div>${recDateBar()}`+
-      (depDay.length?depDay.map(p=>`<div class="movecard"><div class="rn">${p.rn}</div><div class="body"><div class="guest">${vXXX(p.guest,"Nominativo dell'ospite: non incluso nell'importazione dalla Scatola")}</div><div class="meta">${p.type}</div><div class="chips">${p.checkout?'<span class="chip ok">'+t('co_done')+(oraDa(p.outAt)?' · '+oraDa(p.outAt):'')+'</span><span class="chip ok">'+t('dep_free_chip')+'</span>':(p.coUnknown?'<span class="chip">'+XXX('Stato di check-out: non esposto da La Scatola')+' '+t('co_unknown')+'</span>':'<span class="chip warn">'+t('co_todo')+'</span>')}${p.balance>0?'<span class="chip crit">💶 '+t('pr_balance')+': '+fmtEur(p.balance)+'</span>':(p.balUnknown?'<span class="chip">💶 saldo non disponibile</span>':'<span class="chip ok">💶 '+t('pr_paid')+'</span>')}</div>${p.note?`<div class="movenote">📝 ${p.note}</div>`:''}</div></div>`).join(''):`<div class="empty">${t('none_dep')}</div>`);
+      (depDay.length?depDay.map(p=>`<div class="movecard"><div class="rn">${p.rn}</div><div class="body"><div class="guest">${vXXX(p.guest,"Nominativo dell'ospite: non incluso nell'importazione dalla Scatola")}</div><div class="meta">${p.type}</div><div class="chips">${p.checkout?'<span class="chip ok">'+t('co_done')+(oraDa(p.outAt)?' · '+oraDa(p.outAt):'')+'</span><span class="chip ok">'+t('dep_free_chip')+'</span>'+(p.manuale?'<button class="chip undo-co" onclick="annullaUscita(\''+p.rn+'\')">'+t('co_undo')+'</button>':''):(p.coUnknown?'<span class="chip">'+XXX('Stato di check-out: non esposto da La Scatola')+' '+t('co_unknown')+'</span>':'<span class="chip warn">'+t('co_todo')+'</span>')+(RECDAY===0?'<button class="chip co-btn" onclick="segnaUscita(\''+p.rn+'\')">'+t('co_mark')+'</button>':'')}${p.balance>0?'<span class="chip crit">💶 '+t('pr_balance')+': '+fmtEur(p.balance)+'</span>':(p.balUnknown?'<span class="chip">💶 saldo non disponibile</span>':'<span class="chip ok">💶 '+t('pr_paid')+'</span>')}</div>${p.note?`<div class="movenote">📝 ${p.note}</div>`:''}</div></div>`).join(''):`<div class="empty">${t('none_dep')}</div>`);
   } else if(RECTAB==='camere'){
     // stato camere: unione stanze arrivi+partenze
     const rns=[...new Set([...d.arrivi.map(a=>a.rn),...d.partenze.map(p=>p.rn)])].sort((a,b)=>(parseInt(a)||0)-(parseInt(b)||0));
@@ -2061,10 +2066,44 @@ function planningAlertPanel(){
   const rule=`<details class="pl-rule"><summary>ⓘ ${t('planning_rule_lbl')}</summary><div class="lead" style="margin:4px 0 2px;font-size:11.5px">${t('planning_lead')}</div></details>`;
   return recPanel('planning',`🗺️ ${t('planning_h')}`,`${rule}${calHtml}${effHtml}${activeHtml}${doneHtml}`,active.filter(v=>v.target).length?String(active.filter(v=>v.target).length):'');
 }
-function registerCheckout(rn){
-  const d=DEMO[SESSION.prop]; const p=(d.partenze||[]).find(x=>x.rn===rn);
-  if(p){ p.checkout=true; pushTicker(SESSION.prop,'checkout','ev_checkout',[rn]); }
-  renderModule();
+// REGISTRO USCITE — il check-out battuto in reception, condiviso subito.
+// La Scatola porta lo stato DEPARTED, ma passa di qui una volta all'ora: le
+// ragazze ai piani possono restare fino a un'ora davanti a una stanza gia'
+// vuota senza saperlo. Chi sta al banco lo sa nell'istante in cui l'ospite
+// consegna la chiave: con un tocco la stanza diventa verde su tutti i
+// telefoni in pochi secondi. La Scatola poi conferma, non smentisce.
+let USCITE=LS.get('abo_uscite',null)||{saslong:{},hartmann:{},acadia:{}};
+function uscitePulisci(src){
+  const oggi=(typeof scatolaOggi==='function')?scatolaOggi():'';
+  const out={saslong:{},hartmann:{},acadia:{}};
+  Object.keys(out).forEach(pr=>{
+    const m=(src||{})[pr]||{};
+    Object.keys(m).forEach(rn=>{
+      const v=m[rn]; if(!v) return;
+      if(v.giorno&&oggi&&v.giorno!==oggi) return;   // uscita di ieri: non vale oggi
+      out[pr][rn]=v;
+    });
+  });
+  return out;
+}
+USCITE=uscitePulisci(USCITE);
+function uscitaDi(prop,rn){ const m=USCITE[prop]||{}; return m[String(rn)]||null; }
+function uscitaSet(prop,rn,obj){
+  (USCITE[prop]=USCITE[prop]||{});
+  if(obj) USCITE[prop][String(rn)]=obj; else delete USCITE[prop][String(rn)];
+  LS.set('abo_uscite',USCITE);
+  if(fdb){try{ obj?fdb.ref('uscite/'+prop+'/'+rn).set(obj):fdb.ref('uscite/'+prop+'/'+rn).remove(); }catch(e){}}
+}
+function rinfrescaElenchi(){
+  try{ applySlopeData(); if(typeof scatolaArricchisci==='function') scatolaArricchisci(); }catch(e){}
+}
+function segnaUscita(rn){
+  uscitaSet(SESSION.prop,rn,{at:nowHM(),by:SESSION.name||'Reception',giorno:scatolaOggi()});
+  rinfrescaElenchi(); buzz(30); renderModule();
+}
+function annullaUscita(rn){
+  uscitaSet(SESSION.prop,rn,null);
+  rinfrescaElenchi(); renderModule();
 }
 function pushTickerText(prop,type,text,rn){ TICKER.unshift({id:newTid(),prop,type,text,rn:rn||stanzaDa(text),t:nowHM(),read:false}); saveTicker(); }
 // Apre WhatsApp su un numero preciso (vuoto = WhatsApp senza destinatario, si sceglie la chat/gruppo).
@@ -2760,7 +2799,15 @@ function slopeDeriveFor(prop,dayISO){
   res.forEach(r=>{
     const base={rn:r.rn,guest:r.guest,type:r.type,pax:r.pax,nights:r.nights,note:srcArr(r)};
     if(r.cin===dayISO) arrivi.push(Object.assign({},base,{time:''}));
-    else if(r.cout===dayISO) partenze.push({rn:r.rn,guest:r.guest,type:r.type,checkout:(r.stato==='DEPARTED')||/check.?out/i.test(r.state),stato:r.stato||'',outAt:r.outAt||'',balance:0,note:srcDep(r)});
+    else if(r.cout===dayISO){
+      // Vale la prima delle due che si sa: lo stato della Scatola oppure
+      // l'uscita battuta in reception, che di solito arriva molto prima.
+      const u=(dayISO===((typeof scatolaOggi==='function')?scatolaOggi():''))?uscitaDi(prop,r.rn):null;
+      partenze.push({rn:r.rn,guest:r.guest,type:r.type,
+        checkout:(r.stato==='DEPARTED')||/check.?out/i.test(r.state)||!!u,
+        manuale:!!u&&r.stato!=='DEPARTED', uscitaBy:u?(u.by||''):'',
+        stato:r.stato||'',outAt:r.outAt||(u?u.at:''),balance:0,note:srcDep(r)});
+    }
     else if(r.cin<dayISO&&r.cout>dayISO){
       const d0=parseDateAny(r.cin), dd=parseDateAny(dayISO);
       soggiorno.push(Object.assign({},base,{dayOfStay:Math.max(1,daysBetween(d0,dd)+1)}));
@@ -3606,7 +3653,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-10-21.16';
+const APP_VERSIONE='2026-10-22.1';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
