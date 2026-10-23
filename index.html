@@ -690,7 +690,6 @@ table.data .rn{font-family:var(--display);font-weight:700}
 
 <!-- room action sheet mount -->
 <div id="sheetMount"></div>
-<div id="faultMount"></div>
 <div id="pickMount"></div>
 
 
@@ -2560,7 +2559,6 @@ function openRoom(rn){
       <div class="sheet-head"><div class="rn">${rn}</div><div class="st ${stCls}">${info.label}</div><button class="sheet-x" onclick="closeSheet()">×</button></div>
       <div class="sheet-body">${todo}
         <div style="margin-top:12px"><button class="maint-btn" onclick="reportMaintenance('${rn}')">🔧 ${t('maint_report')}</button></div>
-        <label class="maint-btn cam-btn">${t('maint_photo')}<input type="file" accept="image/*" capture="environment" class="cam-input" onchange="onFaultPhoto(this,'${rn}')"></label>
         <label class="lost-btn cam-btn" style="margin-top:8px">📷 ${t('lost_photo')}<input type="file" accept="image/*" capture="environment" class="cam-input" onchange="onLostPhoto(this,'${rn}')"></label>
         <div style="margin-top:6px;text-align:center"><button class="info-link" onclick="reportLost('${rn}')">${t('lost_nophoto')}</button></div>
         ${s.state==='ready'?`<div style="font-size:12px;color:var(--muted2);margin-top:12px">${t('ready_at',(s.by||''),(s.at||''))}</div>`:''}
@@ -2584,7 +2582,7 @@ function catLabel(k){
   return (!et||et==='cat_'+k)?k:et;
 }
 function catIcon(k){ const c=MAINT_CATS.find(x=>x[0]===k); return c?c[1]:'🔧'; }
-let FAULT_CAT='';
+let FAULT_CAT='', FAULT_RN='';
 function setFaultCat(k){ FAULT_CAT=(FAULT_CAT===k)?'':k;
   document.querySelectorAll('#pickMount .cat-chip').forEach(b=>b.classList.toggle('on',b.dataset.k===FAULT_CAT));
   const btn=document.getElementById('fbSend'); if(btn) btn.disabled=!FAULT_CAT&&!((document.getElementById('fbTxt')||{}).value||'').trim();
@@ -2612,42 +2610,8 @@ function sendFaultReport(){
   waMaint(t('th_room')+' '+rn+' · '+testo+'\n\n'+t('fix_prompt')+'\n'+fixLink(prop,rn));
   renderModule();
 }
-let FAULT_RN='', FAULT_URL='', FAULT_FILE=null;
-function onFaultPhoto(input,rn){ FAULT_RN=rn; const file=input.files&&input.files[0]; if(!file)return; FAULT_FILE=file; if(FAULT_URL){try{URL.revokeObjectURL(FAULT_URL);}catch(e){}} FAULT_URL=URL.createObjectURL(file);
-  document.getElementById('faultMount').innerHTML=`<div class="sheet-bg" onclick="if(event.target===this)closeFault()"><div class="sheet"><div class="sheet-head"><div class="rn">${FAULT_RN}</div><div class="st">📷 ${t('maint_photo').replace('📷 ','')}</div><button class="sheet-x" onclick="closeFault()">×</button></div><div class="sheet-body" style="text-align:center"><img src="${FAULT_URL}" style="max-width:100%;border-radius:12px;margin-bottom:14px"><button class="maint-btn" onclick="sendFaultPhoto()">📲 ${t('act_send')} · WhatsApp</button></div></div></div>`;
-  input.value='';
-}
-function closeFault(){ document.getElementById('faultMount').innerHTML=''; }
-// Foto del guasto -> gruppo manutenzione. Due accorgimenti che servono:
-// il numero di stanza finisce nel NOME del file (quando la foto parte come
-// documento e' l'unica cosa che si legge), e il testo con stanza e link
-// "lavoro fatto" resta negli appunti, perche' WhatsApp di solito butta via
-// la didascalia dell'immagine e altrimenti nel gruppo arriverebbe una foto
-// senza sapere di quale camera.
-function sendFaultPhoto(){
-  const file=FAULT_FILE, rn=FAULT_RN, prop=SESSION.prop;
-  const propName=(PROPS.find(p=>p.id===prop)||{}).full||'';
-  const fixLine='\n\n'+t('fix_prompt')+'\n'+fixLink(prop,rn);
-  const testo=t('maint_prefix')+' · '+propName+' · '+t('th_room')+' '+rn
-            +(FAULT_CAT?' · '+catLabel(FAULT_CAT):'')+fixLine;
-
-  maintPush(prop,rn,{text:t('maint_photo').replace('📷 ',''),at:nowHM(),by:SESSION.name||''});
-  repairOpen(prop,rn,[FAULT_CAT?catLabel(FAULT_CAT):'',t('maint_photo').replace('📷 ','')]
-    .filter(Boolean).join(' · '),'piani',true,FAULT_CAT);
-  pushTickerText(prop,'maint',t('th_room')+' '+rn+' 📷',rn);
-
-  let daInviare=file;
-  try{
-    if(file){
-      const est=(file.name&&file.name.indexOf('.')>=0)?file.name.slice(file.name.lastIndexOf('.')):'.jpg';
-      const nome=(propName||'AlpStay').replace(/[^\w]+/g,'-')+'-camera-'+String(rn).replace(/[^\w]+/g,'')+est;
-      daInviare=new File([file],nome,{type:file.type||'image/jpeg'});
-    }
-  }catch(e){ daInviare=file; }
-
-  waGruppo(GRUPPI_WA.manutenzione,testo,daInviare);
-  closeFault(); renderModule();
-}
+// La foto al manutentore e' stata tolta su richiesta: la segnalazione resta
+// quella scritta, con causale e link "lavoro fatto".
 function reportLost(rn){ waLost(t('th_room')+' '+rn+' · '+t('lost_body')+' '); }
 // Foto dell'oggetto smarrito -> gruppo oggetti smarriti. Stessi accorgimenti
 // della foto guasto: il numero di stanza finisce anche nel NOME del file,
@@ -3749,7 +3713,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-10-22.5';
+const APP_VERSIONE='2026-10-23.1';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
