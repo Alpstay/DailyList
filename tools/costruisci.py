@@ -37,6 +37,7 @@ import json
 import os
 import re
 import sys
+import zoneinfo
 
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
@@ -47,7 +48,7 @@ PROPRIETA = {
     '22222222-2222-4222-8222-222222222222': 'hartmann',
     '11111111-1111-4111-8111-111111111111': 'acadia',
 }
-ROMA = datetime.timezone(datetime.timedelta(hours=2))   # Europe/Rome, ora legale
+ROMA = zoneinfo.ZoneInfo('Europe/Rome')   # segue da solo ora legale e ora solare
 ITER = 250_000
 UUID = re.compile(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
 

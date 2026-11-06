@@ -15,12 +15,13 @@ import datetime
 import json
 import re
 import sys
+import zoneinfo
 
 from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-ROMA = datetime.timezone(datetime.timedelta(hours=2))
+ROMA = zoneinfo.ZoneInfo('Europe/Rome')   # segue da solo ora legale e ora solare
 UUID = re.compile(r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}')
 STATI = {'', 'TO_ARRIVE', 'IN_HOUSE', 'DEPARTED'}
 
