@@ -57,6 +57,13 @@ cifrare NON è in questo repository (è pubblico): viene data nel testo dell'att
    check-in. Le prenotazioni future restano quasi tutte senza nome: e' normale, non
    e' un errore, e il costruttore lo dice nella riga RIEPILOGO.
 
+   Se la risposta e' piccola arriva nel messaggio invece che su file, e i dati non
+   si ricopiano a mano: in quel caso togli il filtro `is_primary_guest`, perche' il
+   costruttore legge i campi `primary_guest_*`, presenti su ogni riga. Se anche
+   cosi' resta nel messaggio (fuori stagione sono pochissime righe), passa `""` al
+   posto dell'elenco dei file: la piattaforma mostra il numero di stanza senza nome
+   finche' gli ospiti non si registrano. Non e' un errore e non ferma i passi dopo.
+
 3. **Letti**: `query_curated_view` sulla vista `curated_beds_daily` con
    - `property_id in [i tre id]`
    - `departure gte G`
@@ -86,9 +93,15 @@ cifrare NON è in questo repository (è pubblico): viene data nel testo dell'att
 
    Deve finire con `verifica OK`. Controlla fra l'altro che i soggiorni e i nomi non
    siano finiti in chiaro, che nessuna camera risulti con più di 8 posti letto
-   (segno che le pagine dei letti sono state contate due volte), che ci siano
-   movimenti per oggi e che i dati di La Scatola non siano vecchi di più di tre ore — un file appena scritto può comunque contenere
-   risposte lette molto prima.
+   (segno che le pagine dei letti sono state contate due volte) e che i dati di
+   La Scatola non siano vecchi di più di tre ore — un file appena scritto può
+   comunque contenere risposte lette molto prima.
+
+   Una riga `avviso:` dopo `verifica OK` non blocca: si pubblica. «Nessun movimento
+   per oggi» è un avviso, non un errore — fuori stagione le case sono chiuse e la
+   finestra contiene solo prenotazioni future. Restano errori bloccanti l'elenco
+   vuoto e il file segnato `incompleta`, che è il modo giusto di riconoscere un
+   elenco troncato (confronto fra i soggiorni scritti e `page.total`).
 
 6. **Pubblicazione**: `git add scatola.json`, commit `Dati La Scatola <AAAA-MM-GG HH:MM>`,
    `git push origin HEAD:main`. Poi controlla con `git log origin/main -1` che il
