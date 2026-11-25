@@ -115,11 +115,20 @@ def main():
 
     if totale < minimo:
         guasto('solo %d soggiorni, meno del minimo richiesto (%d)' % (totale, minimo))
+
+    # Nessun movimento oggi non e' di per se' un errore: fuori stagione le case
+    # sono chiuse e la finestra contiene solo prenotazioni future. E' un errore
+    # solo se la finestra e' vuota del tutto (elenco non arrivato). Un elenco
+    # troncato si riconosce dal flag 'incompleta', che costruisci.py calcola
+    # confrontando i soggiorni scritti con page.total di La Scatola.
+    avvisi = []
     if righe_oggi == 0:
-        guasto('nessun movimento per oggi: elenco sospetto')
+        avvisi.append('nessun movimento per oggi: fuori stagione o case chiuse')
 
     print('verifica OK: %d soggiorni, %d movimenti oggi, file di %d minuti fa'
           % (totale, righe_oggi, eta / 60))
+    for a in avvisi:
+        print('avviso: %s' % a)
 
 
 if __name__ == '__main__':
