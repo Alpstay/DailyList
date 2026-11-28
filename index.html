@@ -4,6 +4,14 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Alpstay · Console Operativa</title>
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#1a3c2c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="DailyList">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Semi+Condensed:wght@500;600;700;800&family=Inter:wght@400;500;600;700&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
@@ -275,6 +283,17 @@ h2.sec{font-family:var(--display);font-weight:700;font-size:19px;margin:0 0 2px}
 .gp-sez:first-child{margin-top:0}
 .gp-sub{font-family:var(--display);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--acc);margin-left:13px}
 .gp-n{font-size:11px;color:var(--muted);margin-left:13px}
+/* Installa l'app: compare solo quando il telefono la puo' davvero installare,
+   oppure su iPhone, dove l'installazione si fa a mano dal menu Condividi. */
+.versbar{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);z-index:95;display:flex;align-items:center;gap:12px;width:min(420px,calc(100vw - 28px));background:var(--ink);color:#f6f4ef;border-radius:12px;padding:11px 13px;box-shadow:0 10px 26px rgba(0,0,0,.26)}
+.vb-t{flex:1;font-size:13px;line-height:1.3}
+.vb-btn{appearance:none;border:none;background:#f6f4ef;color:var(--ink);font-family:var(--display);font-weight:700;font-size:13px;border-radius:9px;padding:8px 15px;cursor:pointer;flex-shrink:0}
+.installbox{margin:16px 0 4px;background:var(--gold-soft);border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:12px;padding:12px 14px}
+.installbox.hidden{display:none}
+.ib-t{font-family:var(--display);font-weight:700;font-size:14.5px;color:var(--ink);margin-bottom:3px}
+.ib-d{font-size:12.5px;color:var(--muted);line-height:1.4}
+.ib-btn{appearance:none;margin-top:10px;border:none;background:var(--gold);color:#fff;font-family:var(--display);font-weight:700;font-size:14px;border-radius:10px;padding:10px 20px;cursor:pointer}
+.ib-btn:hover{filter:brightness(1.08)}
 .daily-alert{display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,#e23b2e,#c22a1e);color:#fff;border-radius:12px;padding:8px 11px;margin-bottom:9px;box-shadow:0 5px 14px rgba(194,42,30,.26)}
 .da-ic{font-size:19px;flex-shrink:0;animation:tkpulse 1.3s infinite}
 .da-text{flex:1;font-size:12px;line-height:1.28}
@@ -776,6 +795,7 @@ table.data .rn{font-family:var(--display);font-weight:700}
     </div>
     <div style="margin-top:14px"><button class="role admin" style="width:100%;display:flex;align-items:center;gap:16px" onclick="askPin('admin')"><span class="stripe"></span><div class="ic">🗂️</div><div><h3 style="margin:0" data-i18n="r_admin">Direzione · Backoffice</h3><p data-i18n="r_admin_d">Anagrafica stanze e gestione collaboratori/PIN.</p></div></button></div>
     <div style="margin-top:12px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap"><button class="info-link" onclick="openInfo()">ℹ️ <span data-i18n="nav_info">Come funziona</span></button><button class="info-link" onclick="logoutAccount()">🔒 <span data-i18n="logout_acc">Esci dall&#39;account</span></button></div>
+    <div id="installBox" class="installbox hidden"></div>
     <div class="foot" data-i18n="h_foot">Strutture: Saslong · Hartmann · Acadia.</div>
     <div class="ver-line" id="homeVer"></div>
   </div>
@@ -1131,7 +1151,7 @@ const I18N={
   r_piani:'Piani', r_piani_d:'Digita il numero stanza, vedi cosa fare, segna “pronta”.',
   r_lav:'Lavanderia', r_lav_d:'Fabbisogno biancheria per i prossimi giorni.',
   r_admin:'Direzione · Backoffice', r_admin_d:'Anagrafica stanze e gestione collaboratori/PIN.',
-  h_foot:'Strutture: Saslong · Hartmann · Acadia.', logout_acc:'Esci dall\'account', logout_acc_ask:'Vuoi uscire dall\'account? Per rientrare serviranno email e password.', pin_hint:'Digita il PIN del tuo reparto.',
+  h_foot:'Strutture: Saslong · Hartmann · Acadia.', inst_t:'📲 Installa l\'app sul telefono', inst_d:'Diventa un\'icona sulla schermata del telefono e si apre a schermo pieno, senza barra del browser. Occupa pochissimo e si aggiorna da sola.', inst_btn:'Installa', ver_new:'C\'è una versione aggiornata dell\'app.', ver_btn:'Aggiorna', inst_ios:'Su iPhone: tocca Condividi in fondo allo schermo, poi «Aggiungi a Home».', logout_acc:'Esci dall\'account', logout_acc_ask:'Vuoi uscire dall\'account? Per rientrare serviranno email e password.', pin_hint:'Digita il PIN del tuo reparto.',
   rm_reception_s:'Lista arrivi e partenze', rm_piani_s:'Ricerca stanza e stato pulizie', rm_lav_s:'Fabbisogno biancheria', rm_admin_s:'Backoffice: stanze e collaboratori',
   pin_sub:'Inserisci il PIN del reparto', pin_change:'← Cambia reparto', pin_other:'Questo PIN è di un altro reparto.', pin_invalid:'PIN non valido.',
   tab_arr:'Arrivi', tab_dep:'Partenze', tab_rooms:'Stato camere', tab_dash:'Dashboard', tab_keys:'Chiavi', rd_today:'Oggi', rd_tomorrow:'Domani', rd_yesterday:'Ieri',
@@ -1183,7 +1203,7 @@ const I18N={
   r_piani:'Housekeeping', r_piani_d:'Type the room number, see what to do, mark it “ready”.',
   r_lav:'Laundry', r_lav_d:'Linen needs for the coming days.',
   r_admin:'Management · Backoffice', r_admin_d:'Room registry and staff/PIN management.',
-  h_foot:'Properties: Saslong · Hartmann · Acadia.', logout_acc:'Sign out', logout_acc_ask:'Sign out of the account? You will need the email and password to get back in.', pin_hint:'Enter your department PIN.',
+  h_foot:'Properties: Saslong · Hartmann · Acadia.', inst_t:'📲 Install the app on your phone', inst_d:'It becomes an icon on your home screen and opens full screen, with no browser bar. It takes almost no space and updates by itself.', inst_btn:'Install', ver_new:'A newer version of the app is available.', ver_btn:'Update', inst_ios:'On iPhone: tap Share at the bottom of the screen, then “Add to Home Screen”.', logout_acc:'Sign out', logout_acc_ask:'Sign out of the account? You will need the email and password to get back in.', pin_hint:'Enter your department PIN.',
   rm_reception_s:'Arrivals and departures', rm_piani_s:'Room lookup and cleaning status', rm_lav_s:'Linen needs', rm_admin_s:'Backoffice: rooms and staff',
   pin_sub:'Enter the department PIN', pin_change:'← Change department', pin_other:'This PIN belongs to another department.', pin_invalid:'Invalid PIN.',
   tab_arr:'Arrivals', tab_dep:'Departures', tab_rooms:'Room status', tab_dash:'Dashboard', tab_keys:'Keys', rd_today:'Today', rd_tomorrow:'Tomorrow', rd_yesterday:'Yesterday',
@@ -1235,7 +1255,7 @@ const I18N={
   r_piani:'Cameriste', r_piani_d:'Introdu numărul camerei, vezi ce ai de făcut, marchează „gata”.',
   r_lav:'Spălătorie', r_lav_d:'Necesarul de lenjerie pentru zilele următoare.',
   r_admin:'Conducere · Backoffice', r_admin_d:'Nomenclatorul camerelor și gestionarea colaboratorilor/PIN.',
-  h_foot:'Structuri: Saslong · Hartmann · Acadia.', logout_acc:'Ieșire din cont', logout_acc_ask:'Ieși din cont? Pentru a reveni vor fi necesare emailul și parola.', pin_hint:'Introdu PIN-ul departamentului tău.',
+  h_foot:'Structuri: Saslong · Hartmann · Acadia.', inst_t:'📲 Instalează aplicația pe telefon', inst_d:'Devine o iconiță pe ecranul telefonului și se deschide pe tot ecranul, fără bara browserului. Ocupă foarte puțin și se actualizează singură.', inst_btn:'Instalează', ver_new:'Există o versiune mai nouă a aplicației.', ver_btn:'Actualizează', inst_ios:'Pe iPhone: atinge Partajează jos pe ecran, apoi „Adaugă la ecranul principal”.', logout_acc:'Ieșire din cont', logout_acc_ask:'Ieși din cont? Pentru a reveni vor fi necesare emailul și parola.', pin_hint:'Introdu PIN-ul departamentului tău.',
   rm_reception_s:'Sosiri și plecări', rm_piani_s:'Căutare cameră și stare curățenie', rm_lav_s:'Necesar lenjerie', rm_admin_s:'Backoffice: camere și colaboratori',
   pin_sub:'Introdu PIN-ul departamentului', pin_change:'← Schimbă departamentul', pin_other:'Acest PIN aparține altui departament.', pin_invalid:'PIN invalid.',
   tab_arr:'Sosiri', tab_dep:'Plecări', tab_rooms:'Starea camerelor', tab_dash:'Panou', tab_keys:'Chei', rd_today:'Azi', rd_tomorrow:'Mâine', rd_yesterday:'Ieri',
@@ -1287,7 +1307,7 @@ const I18N={
   r_piani:'Pastrimi', r_piani_d:'Shkruaj numrin e dhomës, shih çfarë të bësh, shëno „gati”.',
   r_lav:'Lavanderia', r_lav_d:'Nevojat për lino për ditët në vijim.',
   r_admin:'Drejtoria · Backoffice', r_admin_d:'Regjistri i dhomave dhe menaxhimi i stafit/PIN.',
-  h_foot:'Strukturat: Saslong · Hartmann · Acadia.', logout_acc:'Dil nga llogaria', logout_acc_ask:'Të dalësh nga llogaria? Për të hyrë përsëri duhen emaili dhe fjalëkalimi.', pin_hint:'Shkruaj PIN-in e repartit tënd.',
+  h_foot:'Strukturat: Saslong · Hartmann · Acadia.', inst_t:'📲 Instalo aplikacionin në telefon', inst_d:'Bëhet një ikonë në ekranin e telefonit dhe hapet në ekran të plotë, pa shiritin e shfletuesit. Zë shumë pak dhe përditësohet vetë.', inst_btn:'Instalo', ver_new:'Ka një version më të ri të aplikacionit.', ver_btn:'Përditëso', inst_ios:'Në iPhone: prek Ndaj poshtë ekranit, pastaj «Shto në Kreu».', logout_acc:'Dil nga llogaria', logout_acc_ask:'Të dalësh nga llogaria? Për të hyrë përsëri duhen emaili dhe fjalëkalimi.', pin_hint:'Shkruaj PIN-in e repartit tënd.',
   rm_reception_s:'Mbërritje dhe nisje', rm_piani_s:'Kërko dhomën dhe statusin e pastrimit', rm_lav_s:'Nevoja për lino', rm_admin_s:'Backoffice: dhoma dhe staf',
   pin_sub:'Fut PIN-in e repartit', pin_change:'← Ndrysho repartin', pin_other:'Ky PIN i përket një reparti tjetër.', pin_invalid:'PIN i pavlefshëm.',
   tab_arr:'Mbërritje', tab_dep:'Nisje', tab_rooms:'Statusi i dhomave', tab_dash:'Paneli', tab_keys:'Çelësat', rd_today:'Sot', rd_tomorrow:'Nesër', rd_yesterday:'Dje',
@@ -1333,7 +1353,7 @@ const I18N={
  },
 };
 function t(k){ let s=(I18N[LANG]&&I18N[LANG][k]); if(s===undefined)s=I18N.it[k]!==undefined?I18N.it[k]:k; for(let i=1;i<arguments.length;i++) s=s.split('{'+(i-1)+'}').join(arguments[i]); return s; }
-function applyStaticI18n(){ document.querySelectorAll('[data-i18n]').forEach(el=>{ el.innerHTML=t(el.getAttribute('data-i18n')); }); if(typeof scatolaBanner==='function') scatolaBanner(); }
+function applyStaticI18n(){ document.querySelectorAll('[data-i18n]').forEach(el=>{ el.innerHTML=t(el.getAttribute('data-i18n')); }); if(typeof scatolaBanner==='function') scatolaBanner(); if(typeof installBox==='function') installBox(); }
 function setLang(l){ LANG=l; LS.set('abo_lang',l); applyStaticI18n(); document.querySelectorAll('.langbtn').forEach(b=>b.classList.toggle('on',b.dataset.l===l)); if(SESSION.role){ renderModule(); } else if(!document.getElementById('scr-info').classList.contains('hidden')){ renderInfo(); } else if(!document.getElementById('scr-pin').classList.contains('hidden')&&PINROLE){ document.getElementById('pinSub').textContent=t('rm_'+PINROLE+'_s'); document.getElementById('pinRole').textContent=ROLE_META[PINROLE].ic+' '+t('r_'+PINROLE); document.getElementById('pinPad')&&0; } }
 function langBar(){ return `<div class="langbar">${LANGS.map(([c,l])=>`<button class="langbtn ${LANG===c?'on':''}" data-l="${c}" onclick="setLang('${c}')">${l}</button>`).join('')}</div>`; }
 function openInfo(){ renderInfo(); go('scr-info'); }
@@ -4381,7 +4401,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-11-28.9';
+const APP_VERSIONE='2026-11-28.10';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
@@ -5576,6 +5596,106 @@ async function avvio(){
 }
 avvio();
 setInterval(function(){ let ch=false; for(const pr in SETTINGS){ const st=SETTINGS[pr]; if(st&&st.dayNoteExp&&Date.now()>st.dayNoteExp){ st.dayNote=''; st.dayNoteExp=null; ch=true; } } if(ch){ saveSettings(); if(SESSION.role) renderModule(); } checkDailyTaskNotify(); }, 60000);
+
+/* =========================================================
+   INSTALLA L'APP SUL TELEFONO
+   L'app sta su GitHub Pages: senza questo si apre solo dal browser, e chi
+   lavora ai piani non tiene aperto un browser tutto il giorno. Installata
+   diventa un'icona sulla schermata del telefono e si apre a schermo pieno,
+   senza la barra degli indirizzi.
+   Su Android il telefono stesso offre l'installazione e noi la chiediamo con
+   un bottone; su iPhone non esiste un modo automatico, quindi si spiegano i
+   due tocchi da fare a mano.
+   ========================================================= */
+// Dichiarazioni di funzione e var, non const: installBox() viene chiamata
+// da applyStaticI18n() all'avvio, cioe' prima che questo blocco sia stato
+// eseguito. Con const si legge una variabile non ancora inizializzata e la
+// pagina parte con un errore.
+var PROMPT_INSTALLA=null;
+function iOS(){ return /iphone|ipad|ipod/i.test(navigator.userAgent||''); }
+// Gia' installata: aperta a schermo pieno dall'icona, non dal browser.
+function giaInstallata(){
+  return window.matchMedia('(display-mode: standalone)').matches
+      || window.navigator.standalone===true;
+}
+
+window.addEventListener('beforeinstallprompt',ev=>{
+  ev.preventDefault();            // il banner lo mostriamo noi, dove serve
+  PROMPT_INSTALLA=ev;
+  installBox();
+});
+window.addEventListener('appinstalled',()=>{ PROMPT_INSTALLA=null; installBox(); });
+
+function installBox(){
+  const box=document.getElementById('installBox'); if(!box) return;
+  if(giaInstallata()){ box.className='installbox hidden'; box.innerHTML=''; return; }
+  if(PROMPT_INSTALLA){
+    box.className='installbox';
+    box.innerHTML='<div class="ib-t">'+t('inst_t')+'</div><div class="ib-d">'+t('inst_d')+'</div>'+
+                  '<button class="ib-btn" onclick="installaApp()">'+t('inst_btn')+'</button>';
+    return;
+  }
+  if(iOS()){
+    box.className='installbox';
+    box.innerHTML='<div class="ib-t">'+t('inst_t')+'</div><div class="ib-d">'+t('inst_ios')+'</div>';
+    return;
+  }
+  box.className='installbox hidden'; box.innerHTML='';
+}
+
+function installaApp(){
+  if(!PROMPT_INSTALLA) return;
+  const ev=PROMPT_INSTALLA; PROMPT_INSTALLA=null;
+  ev.prompt();
+  // L'esito non si forza: se rifiuta, il telefono riproporra' l'evento piu'
+  // avanti da se'. Qui si toglie solo il bottone, che non serve piu' adesso.
+  Promise.resolve(ev.userChoice).catch(()=>{}).then(()=>installBox());
+}
+
+// Service worker: serve a rendere l'app installabile e a non lasciare lo
+// schermo bianco dove manca il segnale. Legge sempre prima dalla rete.
+if('serviceWorker' in navigator){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  });
+}
+
+
+/* ---------------------------------------------------------
+   AVVISO DI VERSIONE NUOVA
+   Installata, l'app resta aperta tutta la giornata, e il browser tiene in
+   cache la pagina per dieci minuti: senza questo, chi l'ha aperta la mattina
+   potrebbe lavorare per ore su una versione vecchia senza accorgersene.
+   Si chiede al server solo l'intestazione (nessun corpo, pochi byte) e si
+   confronta la data con quella della pagina aperta. Non si ricarica da soli:
+   ricaricare mentre una compila una segnalazione le farebbe perdere il
+   lavoro. Si avvisa, e decide lei quando toccare.
+   --------------------------------------------------------- */
+var VERS_VISTA=false, VERS_ULTIMO=0;
+function controllaVersione(){
+  if(VERS_VISTA) return;
+  if(Date.now()-VERS_ULTIMO < 10*60*1000) return;        // non piu' di una volta ogni 10'
+  VERS_ULTIMO=Date.now();
+  var mia=Date.parse(document.lastModified);
+  fetch('index.html',{method:'HEAD',cache:'reload'}).then(function(r){
+    if(!r||!r.ok) return;
+    var lm=r.headers.get('last-modified'); if(!lm) return;   // senza data non si inventa nulla
+    var srv=Date.parse(lm);
+    if(isNaN(srv)||isNaN(mia)) return;
+    if(srv>mia+1000){ VERS_VISTA=true; barraVersione(); }
+  }).catch(function(){});
+}
+function barraVersione(){
+  if(document.getElementById('versBar')) return;
+  var el=document.createElement('div');
+  el.id='versBar'; el.className='versbar';
+  el.innerHTML='<span class="vb-t">'+t('ver_new')+'</span>'+
+               '<button class="vb-btn" onclick="location.reload()">'+t('ver_btn')+'</button>';
+  document.body.appendChild(el);
+}
+document.addEventListener('visibilitychange',function(){ if(!document.hidden) controllaVersione(); });
+window.addEventListener('load',function(){ setTimeout(controllaVersione,8000); });
+
 </script>
 </body>
 </html>
