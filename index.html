@@ -341,6 +341,18 @@ h2.sec{font-family:var(--display);font-weight:700;font-size:19px;margin:0 0 2px}
 .cs.ctrl{background:var(--amber-bg);border-color:#efd8a8} .cs.ctrl b{color:var(--amber)}
 .cs.ready{background:#efefec;border-color:#dedeD9} .cs.ready b{color:var(--muted)}
 .rec-actions{margin-top:9px;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 11px}
+/* Disposizione sul planning: fondo rosa. E' l'unico riquadro della reception
+   che chiede una DECISIONE invece di riportare un dato, e nella colonna di
+   riquadri bianchi passava inosservato. */
+#rp-planning{background:#fdf0f4;border-color:#eec6d4}
+#rp-planning>.rp-sum{color:#8a2f4b}
+#rp-planning>.rp-sum::after{color:#b9748d}
+#rp-planning>.rp-sum:hover{background:#f8dfe8}
+#rp-planning .rp-note{background:#8a2f4b;color:#fff}
+/* Le righe restano bianche sul rosa: il testo si legge e la riga che si tocca
+   si stacca dal fondo. */
+#rp-planning .wl-sugg{background:#fff;border-radius:9px;padding:7px 9px 7px 11px;margin-bottom:5px;border-bottom:1px solid #f0dde4}
+#rp-planning .wl-rule,#rp-planning .pl-stuck{color:#8a4d60}
 .rec-actions h3{font-family:var(--display);font-weight:700;font-size:13.5px;margin:0 0 6px}
 .ra-block{margin-bottom:9px} .ra-block:last-child{margin-bottom:0}
 /* Azioni reception · la reception lavora al computer, non al telefono: in una
@@ -4518,7 +4530,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-11-28.14';
+const APP_VERSIONE='2026-11-28.15';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
