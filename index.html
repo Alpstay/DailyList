@@ -464,6 +464,16 @@ details.rec-actions.rp:not([open]) .rp-sum::after{transform:rotate(-90deg)}
 .co-btn{appearance:none;border:none;background:var(--green);color:#fff;font-family:var(--display);font-weight:700;font-size:12.5px;border-radius:10px;padding:9px 13px;cursor:pointer;white-space:nowrap}
 .co-btn:hover{filter:brightness(1.06)}
 .ticker{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:8px;padding:7px 10px 7px 12px;margin-bottom:12px;overflow:hidden}
+/* Con messaggi la bacheca si accende di giallo: e' il colore dell'attenzione,
+   e sta in cima alla pagina. Vuota resta grigia e zitta: un giallo permanente
+   che non dice niente smette di essere un avviso nel giro di due giorni. */
+.ticker:not(.empty){background:#fff6cf;border-color:#efdc8c;border-left-color:#d8a81e}
+.ticker:not(.empty) .tk-live{color:#6b5407}
+.ticker:not(.empty) .tk-dot{background:#d8a81e}
+.ticker:not(.empty) .tk-cnt{background:#b8860b}
+.ticker:not(.empty) .tk-item{background:#fffdf4;border-color:#eadfae}
+.ticker:not(.empty) .tk-vp{-webkit-mask-image:none;mask-image:none}
+.tk-vp.ferma .tk-track.run{animation-play-state:paused}
 .tk-live{display:flex;align-items:center;gap:6px;font-family:var(--display);font-weight:800;font-size:12px;letter-spacing:.14em;color:var(--muted);flex-shrink:0}
 .tk-dot{width:7px;height:7px;border-radius:50%;background:var(--acc);animation:tkpulse 2.4s infinite}
 .tk-cnt{background:var(--acc);color:#fff;border-radius:20px;font-size:11px;font-weight:700;padding:1px 7px;letter-spacing:0;margin-left:2px}
@@ -2008,7 +2018,7 @@ function renderTicker(){
   const items=list.map(e=>`<span class="tk-item"><span class="tk-ic">${TIC_ICON[e.type]||'•'}</span><span class="tk-tx"><b>${e.t}</b> ${e.text!=null?e.text:t(e.key,...(e.params||[]))}</span><button class="tk-ack" onclick="tickerAck('${e.id}')">${t('tk_done')}</button></span>`).join('');
   return `<div class="ticker">
     <div class="tk-live"><span class="tk-dot"></span>LIVE<span class="tk-cnt">${list.length}</span></div>
-    <div class="tk-vp"><div class="tk-track">${items}</div></div>
+    <div class="tk-vp" onclick="tickerPausa(this)"><div class="tk-track">${items}</div></div>
     
   </div>`;
 }
@@ -2118,6 +2128,9 @@ function postitFit(){
     if(!ta.dataset.fit){ ta.dataset.fit='1'; ta.addEventListener('input',()=>{ ta.style.height='auto'; ta.style.height=Math.max(78,ta.scrollHeight)+'px'; }); }
   });
 }
+// Sul telefono non esiste il passaggio del mouse: senza questo, premere
+// "Fatto" significa inseguire un bottone che scorre. Un tocco ferma il nastro.
+function tickerPausa(vp){ const tr=vp.querySelector('.tk-track'); if(!tr)return; vp.classList.toggle('ferma'); }
 function tickerFit(){ document.querySelectorAll('.tk-vp').forEach(vp=>{ const tr=vp.querySelector('.tk-track'); if(!tr||tr.dataset.fit)return; const w=tr.scrollWidth, vpw=vp.clientWidth; if(w>vpw+4){ tr.innerHTML=tr.innerHTML+tr.innerHTML; tr.style.animationDuration=Math.max(16,Math.round(w/45))+'s'; tr.classList.add('run'); } tr.dataset.fit='1'; }); }
 function renderModule(){
   document.getElementById('modSub').textContent=giornoEtichetta(0)+' · '+((PROPS.find(p=>p.id===SESSION.prop)||{}).full||'')+(typeof scatolaStamp==='function'?' · '+scatolaStamp():'')+(typeof APP_VERSIONE!=='undefined'?' · v'+APP_VERSIONE:'');
@@ -2854,13 +2867,15 @@ function viewPiani(){
     if(myOv[rn]) return myOv[rn]===SESSION.name; // stanza riassegnata oggi: la vede solo chi la riceve
     return myFloors.length?myFloors.includes(floorOf(SESSION.prop,rn)):true;
   }).sort((a,b)=>{const ra=rankRoom(a),rb=rankRoom(b);return ra!==rb?ra-rb:(parseInt(a)||0)-(parseInt(b)||0);});
-  return `<div class="piani-hero">
+  // La bacheca LIVE sta PRIMA del tastierino: e' un avviso, e un avviso sotto
+  // dodici tasti su un telefono non lo legge nessuno.
+  return `${renderTicker()}<div class="piani-hero">
       <div class="lbl">${t('piani_prompt')}</div>
       <div class="roomdisp" id="roomDisp"><span class="ph">— — —</span></div>
     </div>
     <div class="keypad piani" id="roomPad"></div>
     <button class="go-btn" id="roomGo" disabled onclick="openRoom(ROOMBUF)">${t('open_room')}</button>
-    ${oggiBar()}${renderTicker()}${dayNotePostit(false)}${compitiPanel()}${symIndex()}
+    ${oggiBar()}${dayNotePostit(false)}${compitiPanel()}${symIndex()}
     <div class="assigned">
       <h4>${t('your_rooms')}${myFloors.length?` · ${myFloors.join(', ')}`:''}</h4>
       ${assigned.map(r=>{const s=roomStatus(r);const info=roomInfo(r);const cfgObj=info.arr||info.stay;const change=info.stay&&isChangeDay(info.stay.dayOfStay,info.stay.nights);const done=s.state==='ready';const freed=info.dep&&info.dep.checkout;const mq=MAINT[SESSION.prop]&&MAINT[SESSION.prop][r];const reassigned=myOv[r]===SESSION.name;const rowcl=done?'done':(freed?'freed':(info.stay?'staybar':(info.arr?'ctrlbar':'occ')));return `<div class="aroom ${rowcl}" onclick="openRoom('${r}')"><div class="n">${r}</div><div class="a-beds">${cfgObj?bedIcons(cfgObj.config,cfgObj.type,'sm'):'—'}</div><div class="a-flags">${change?'<span class="fl" title="'+t('chip_change')+'">🔄</span>':''}${mq?'<span class="fl" title="'+t('maint_chip')+'">🔧</span>':''}${reassigned?'<span class="fl" title="'+t('workload_sugg_h')+'">🔀</span>':''}</div>${done?'<span class="status-pill fatta">✓ '+t('st_fatta')+'</span>':statusPill(s,r)}</div>`;}).join('')}
@@ -4332,7 +4347,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-11-28.4';
+const APP_VERSIONE='2026-11-28.5';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
