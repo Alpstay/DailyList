@@ -352,6 +352,23 @@ h2.sec{font-family:var(--display);font-weight:700;font-size:19px;margin:0 0 2px}
 .ra-big{width:100%;padding:12px;font-size:14.5px}
 .ra-grid{display:grid;grid-template-columns:1fr;gap:12px;align-items:start}
 @media(min-width:860px){ .ra-grid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))} }
+.ra-bar{display:flex;flex-wrap:wrap;gap:8px}
+.ra-tab{
+  appearance:none;cursor:pointer;flex:1 1 118px;min-width:0;position:relative;
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  background:var(--snow);border:1px solid var(--line);border-radius:12px;padding:11px 8px 9px;
+  font-family:var(--display);font-weight:700;font-size:11.5px;color:var(--slate);line-height:1.2;text-align:center;
+}
+.ra-tab:hover{background:#fff;border-color:var(--acc);color:var(--acc)}
+.ra-tab.on{background:var(--acc);border-color:var(--acc);color:#fff}
+.rt-ic{font-size:21px;line-height:1}
+.rt-l{display:block;overflow-wrap:anywhere}
+.rt-n{position:absolute;top:5px;right:7px;min-width:17px;height:17px;border-radius:9px;background:var(--red);color:#fff;font-size:10.5px;line-height:17px;padding:0 4px}
+.ra-tab.on .rt-n{background:#fff;color:var(--acc)}
+/* Il modulo aperto, uno solo alla volta, staccato dalla barra da una riga. */
+.ra-open:not(:empty){margin-top:12px;padding-top:12px;border-top:1px solid var(--line)}
+.ra-open>.ra-block{margin:0}
+.ra-open>.ra-block>label{display:flex;align-items:center;gap:6px;font-size:11.5px;letter-spacing:.05em;color:var(--slate);margin-bottom:8px}
 .ra-grid>.ra-block{
   margin:0;display:flex;flex-direction:column;min-width:0;
   background:var(--snow);border:1px solid var(--line);border-radius:12px;padding:11px 13px 13px;
@@ -2270,15 +2287,16 @@ function viewReception(){
         return `<div class="rcell ${x.cl} ${mq||bal?'has-maint':''}">${flags?`<span class="rc-flags">${flags}</span>`:''}<div class="n">${r}</div><div class="s">${x.lab}</div>${s.at?`<div class="rc-at">${s.by||''} ${s.at}</div>`:''}</div>`;}).join('')}</div>
       ${recPanel('azioni',t('rec_actions'),`
         <div class="ra-top"><button class="ra-btn ra-big" onclick="sendAppLink()">${t('app_link_btn')}</button></div>
-        <div class="ra-grid">
-        ${staffContactBlock()}
-        <div class="ra-block"><label>📢 ${t('act_notify')}</label><div class="ra-row"><input id="recMsg" class="ra-inp" placeholder="${t('notify_ph')}"><button class="ra-btn" onclick="notifyPiani()">${t('act_send')}</button></div></div>
-        <div class="ra-block"><label>🔀 ${t('act_roomchange')} <span class="ra-src">· ${t('from_slope')}</span></label>
+        ${raBarra(d)}
+        <div class="ra-open">${
+          RA_TAB==='chi'    ? staffContactBlock() :
+          RA_TAB==='msg'    ? `<div class="ra-block"><label>📢 ${t('act_notify')}</label><div class="ra-row"><input id="recMsg" class="ra-inp" placeholder="${t('notify_ph')}"><button class="ra-btn" onclick="notifyPiani()">${t('act_send')}</button></div></div>` :
+          RA_TAB==='cambio' ? `<div class="ra-block"><label>🔀 ${t('act_roomchange')} <span class="ra-src">· ${t('from_slope')}</span></label>
           ${(d.cambi&&d.cambi.length)?d.cambi.map(c=>`<div class="cambio-row"><span class="cambio-rn">${c.from} → ${c.to}</span>${c.guest?`<span class="cambio-g">${c.guest}</span>`:''}<button class="ra-wa" onclick="moveLuggage('${c.from}','${c.to}')">${t('act_luggage')}</button></div>`).join(''):`<div class="ra-empty">${t('cambi_none')}</div>`}
-        </div>
-        <div class="ra-block"><label>🔧 ${t('act_fault')}</label><div class="ra-row"><input id="rfRoom" class="ra-inp sm" placeholder="${t('th_room')}"><select id="rfCat" class="bo-sel"><option value="">${t('fault_cat_pick')}</option>${MAINT_CATS.map(([k,ic])=>`<option value="${k}">${ic} ${t('cat_'+k)}</option>`).join('')}</select></div><div class="ra-row" style="margin-top:5px"><input id="rfText" class="ra-inp" placeholder="${t('fault_ph')}"></div><button class="ra-wa" onclick="reportFault()">${t('act_fault_send')}</button></div>
-        <div class="ra-block"><label>👜 ${t('lost_report')}</label><div class="ra-row"><input id="lfRoom" class="ra-inp sm" placeholder="${t('th_room')}"><input id="lfText" class="ra-inp" placeholder="${t('lost_ph')}"></div><button class="ra-wa" onclick="reportLostRec()">👜 ${t('act_send')}</button></div>
-        </div>
+          </div>` :
+          RA_TAB==='guasto' ? `<div class="ra-block"><label>🔧 ${t('act_fault')}</label><div class="ra-row"><input id="rfRoom" class="ra-inp sm" placeholder="${t('th_room')}"><select id="rfCat" class="bo-sel"><option value="">${t('fault_cat_pick')}</option>${MAINT_CATS.map(([k,ic])=>`<option value="${k}">${ic} ${t('cat_'+k)}</option>`).join('')}</select></div><div class="ra-row" style="margin-top:5px"><input id="rfText" class="ra-inp" placeholder="${t('fault_ph')}"></div><button class="ra-wa" onclick="reportFault()">${t('act_fault_send')}</button></div>` :
+          RA_TAB==='lost'   ? `<div class="ra-block"><label>👜 ${t('lost_report')}</label><div class="ra-row"><input id="lfRoom" class="ra-inp sm" placeholder="${t('th_room')}"><input id="lfText" class="ra-inp" placeholder="${t('lost_ph')}"></div><button class="ra-wa" onclick="reportLostRec()">👜 ${t('act_send')}</button></div>` : ''
+        }</div>
       `)}`;
   } else {
     inner=viewKeys(d);
@@ -2476,6 +2494,32 @@ function setRecTab(t){ RECTAB=t; renderModule(); }
 // Rubrica rapida della reception: una chip per collaboratrice, si tocca e si apre la sua chat
 // WhatsApp. Il pallino verde indica chi sta lavorando adesso. Chi non ha il numero in anagrafica
 // compare in grigio, così si vede subito a chi va aggiunto.
+/* Barra delle azioni: un bottone per funzione, icona grande e dicitura sotto.
+   Il modulo compare solo quando serve, uno alla volta: la reception ha cinque
+   funzioni ma ne usa una per volta, e tenerle tutte aperte riempiva lo schermo
+   di campi vuoti. Chiuse, il riquadro e' una riga. */
+var RA_TAB='';
+function raTab(k){ RA_TAB=(RA_TAB===k?'':k); renderModule();
+  // il campo giusto gia' pronto sotto le dita: una digitazione in meno
+  setTimeout(function(){ const f={msg:'recMsg',guasto:'rfRoom',lost:'lfRoom'}[k];
+    const el=f&&document.getElementById(f); if(el&&RA_TAB===k) el.focus(); },60);
+}
+function raBarra(d){
+  const n=(d&&d.cambi&&d.cambi.length)||0;
+  const voci=[
+    ['chi',   '💬', t('staff_contact_h'), 0],
+    ['msg',   '📢', t('act_notify'),      0],
+    ['cambio','🔀', t('act_roomchange'),  n],   // col numero: un cambio stanza non si scopre per caso
+    ['guasto','🔧', t('act_fault'),       0],
+    ['lost',  '👜', t('lost_report'),     0],
+  ];
+  return '<div class="ra-bar">'+voci.map(function(v){
+    return '<button class="ra-tab'+(RA_TAB===v[0]?' on':'')+'" onclick="raTab(\''+v[0]+'\')">'+
+           '<span class="rt-ic">'+v[1]+'</span>'+
+           '<span class="rt-l">'+v[2]+'</span>'+
+           (v[3]?'<span class="rt-n">'+v[3]+'</span>':'')+'</button>';
+  }).join('')+'</div>';
+}
 function staffContactBlock(){
   const prop=SESSION.prop;
   const list=COLLAB.map((c,i)=>({c,i})).filter(({c})=>c.role!=='admin'&&(c.prop===prop||c.prop==='*'));
@@ -4457,7 +4501,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-11-28.12';
+const APP_VERSIONE='2026-11-28.13';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
