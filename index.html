@@ -343,6 +343,30 @@ h2.sec{font-family:var(--display);font-weight:700;font-size:19px;margin:0 0 2px}
 .rec-actions{margin-top:9px;background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:10px 11px}
 .rec-actions h3{font-family:var(--display);font-weight:700;font-size:13.5px;margin:0 0 6px}
 .ra-block{margin-bottom:9px} .ra-block:last-child{margin-bottom:0}
+/* Azioni reception · la reception lavora al computer, non al telefono: in una
+   colonna sola meta' schermo resta vuota e per arrivare agli oggetti smarriti
+   si scorre. Qui i blocchi diventano riquadri affiancati, ognuno chiuso dal
+   suo bordo e col titolo staccato da una riga, cosi' l'occhio trova il
+   riquadro giusto senza leggere. Sotto gli 860px torna una colonna sola. */
+.ra-top{margin-bottom:12px}
+.ra-big{width:100%;padding:12px;font-size:14.5px}
+.ra-grid{display:grid;grid-template-columns:1fr;gap:12px;align-items:start}
+@media(min-width:860px){ .ra-grid{grid-template-columns:repeat(auto-fit,minmax(320px,1fr))} }
+.ra-grid>.ra-block{
+  margin:0;display:flex;flex-direction:column;min-width:0;
+  background:var(--snow);border:1px solid var(--line);border-radius:12px;padding:11px 13px 13px;
+}
+.ra-grid>.ra-block>label{
+  display:flex;align-items:center;gap:6px;
+  font-size:11.5px;letter-spacing:.05em;color:var(--slate);
+  border-bottom:1px solid var(--line);padding-bottom:7px;margin-bottom:10px;
+}
+.ra-grid>.ra-block .ra-src{text-transform:none;letter-spacing:0;font-weight:600;color:var(--muted2)}
+/* I bottoni si allineano in fondo: i riquadri restano alti uguali e i tasti
+   stanno tutti sulla stessa riga dell'occhio. */
+.ra-grid>.ra-block .ra-wa{margin-top:auto;align-self:flex-start}
+.ra-grid>.ra-block .ra-row+.ra-row{margin-top:6px}
+.ra-grid>.ra-block .wa-chips{margin-bottom:0}
 .ra-block label{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);margin-bottom:3px}
 .ra-row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
 .ra-inp{flex:1;min-width:110px;padding:7px 9px;border:1px solid var(--line);border-radius:9px;font-size:13.5px;font-family:var(--body);background:#fff}
@@ -2215,7 +2239,8 @@ function viewReception(){
       <div class="rooms-grid">${rns.map(r=>{const s=roomStatus(r);const x=roomState(s,r);const mq=MAINT[SESSION.prop]&&MAINT[SESSION.prop][r];const dog=hasDog(d.arrivi.find(a=>a.rn===r));const bal=balconyAlert(SESSION.prop,d.arrivi.find(a=>a.rn===r));const flags=`${mq?'<span title="manutenzione">🔧</span>':''}${dog?'<span title="cane">🐕</span>':''}${bal?'<span title="balcone richiesto">🪟</span>':''}`;
         return `<div class="rcell ${x.cl} ${mq||bal?'has-maint':''}">${flags?`<span class="rc-flags">${flags}</span>`:''}<div class="n">${r}</div><div class="s">${x.lab}</div>${s.at?`<div class="rc-at">${s.by||''} ${s.at}</div>`:''}</div>`;}).join('')}</div>
       ${recPanel('azioni',t('rec_actions'),`
-        <div class="ra-block"><button class="ra-btn" style="width:100%" onclick="sendAppLink()">${t('app_link_btn')}</button></div>
+        <div class="ra-top"><button class="ra-btn ra-big" onclick="sendAppLink()">${t('app_link_btn')}</button></div>
+        <div class="ra-grid">
         ${staffContactBlock()}
         <div class="ra-block"><label>📢 ${t('act_notify')}</label><div class="ra-row"><input id="recMsg" class="ra-inp" placeholder="${t('notify_ph')}"><button class="ra-btn" onclick="notifyPiani()">${t('act_send')}</button></div></div>
         <div class="ra-block"><label>🔀 ${t('act_roomchange')} <span class="ra-src">· ${t('from_slope')}</span></label>
@@ -2223,6 +2248,7 @@ function viewReception(){
         </div>
         <div class="ra-block"><label>🔧 ${t('act_fault')}</label><div class="ra-row"><input id="rfRoom" class="ra-inp sm" placeholder="${t('th_room')}"><select id="rfCat" class="bo-sel"><option value="">${t('fault_cat_pick')}</option>${MAINT_CATS.map(([k,ic])=>`<option value="${k}">${ic} ${t('cat_'+k)}</option>`).join('')}</select></div><div class="ra-row" style="margin-top:5px"><input id="rfText" class="ra-inp" placeholder="${t('fault_ph')}"></div><button class="ra-wa" onclick="reportFault()">${t('act_fault_send')}</button></div>
         <div class="ra-block"><label>👜 ${t('lost_report')}</label><div class="ra-row"><input id="lfRoom" class="ra-inp sm" placeholder="${t('th_room')}"><input id="lfText" class="ra-inp" placeholder="${t('lost_ph')}"></div><button class="ra-wa" onclick="reportLostRec()">👜 ${t('act_send')}</button></div>
+        </div>
       `)}`;
   } else {
     inner=viewKeys(d);
@@ -4401,7 +4427,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-11-28.10';
+const APP_VERSIONE='2026-11-28.11';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
