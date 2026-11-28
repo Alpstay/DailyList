@@ -580,9 +580,16 @@ details.rec-actions.rp:not([open]) .rp-sum::after{transform:rotate(-90deg)}
 .aroom .fl{font-size:23px}
 .aroom .status-pill{font-size:14px;padding:5px 12px}
 .aroom .n{font-size:24px}
-.symidx{display:flex;flex-wrap:wrap;gap:4px;max-width:440px;margin:0 auto 9px;padding:6px 8px;background:var(--paper);border:1px solid var(--line);border-radius:10px}
-.symidx .si{display:inline-flex;align-items:center;gap:4px;font-size:10.5px;font-weight:600;color:var(--muted);background:var(--snow);border:1px solid var(--line2);border-radius:14px;padding:2px 7px}
-.symidx .si-ic{font-size:13px}
+/* Legenda dei colori: prima erano pastiglie con la sola parola, e solo due
+   su otto spiegavano qualcosa. Una parola come "Fermata" o "Controllo" non si
+   indovina il primo giorno, e chi e' nuova e' proprio quella che ne ha bisogno. */
+.symidx{max-width:440px;margin:0 auto 9px;padding:7px 11px 9px;background:var(--paper);border:1px solid var(--line);border-radius:12px}
+.symidx .si-h{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted2);margin-bottom:4px}
+.symidx .si{display:flex;align-items:baseline;gap:8px;padding:4px 0;border-top:1px solid var(--line2);font-size:12.5px;line-height:1.34;color:var(--muted)}
+.symidx .si:first-of-type{border-top:0}
+.symidx .si-ic{flex:0 0 19px;font-size:14px;text-align:center}
+.symidx .si-l{font-weight:700;color:var(--ink);white-space:nowrap}
+.symidx .si-d{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
 .status-pill{font-size:13px}
 .aroom.freed{background:#edf7f0;border-color:#bfe0cd}
 .aroom.occ{background:#fdeee9;border-color:#f1cec2}
@@ -1132,7 +1139,7 @@ const I18N={
   dep_h:'Partenze di oggi', dep_h_day:'Partenze', dep_lead:'Stanze che si liberano. Il check-out effettivo arriverà da Slope.',
   co_done:'✓ check-out effettuato', co_todo:'in partenza · check-out da fare', co_mark:'✓ Segna uscito', co_undo:'annulla', co_unknown:'in partenza · check-out non rilevabile', co_do:'Registra check-out', none_arr:'Nessun arrivo.', none_dep:'Nessuna partenza.', pr_print:'🖨 Stampa', pr_note:'Note e promemoria', pr_balance:'Saldo aperto', pr_status:'Stato', pr_paid:'saldato', pr_printed:'Stampato il', pr_none:'—', pr_cart_title:'Biancheria da preparare per domani', pr_totals:'Totale da caricare sul carrello', pr_cfg_tbd:'Da verificare', pr_lav_all:'Totale dei giorni scelti', pr_reason:'Motivo', pr_arr:'Arrivo',
   rooms_h:'Stato camere', rooms_lead:'{0}/{1} pronte · aggiornato dai Piani in tempo reale (in questa demo, cambiando reparto nella stessa finestra).',
-  st_ready:'Pronta', st_wip:'In corso', st_todo:'Da fare', stay_short:'soggiorno', stay_dn:'Soggiorno · giorno {0} su {1}', st_fermata:'Fermata', st_partenza:'Partenza', st_dentro:'Parte oggi — ancora dentro', st_arrivo:'Arrivo', st_inpart:'In partenza', st_libera:'Libera — si può pulire', st_controllo:'Controllo', st_inwork:'In rifacimento', st_fatta:'Fatta',
+  st_ready:'Pronta', st_wip:'In corso', st_todo:'Da fare', stay_short:'soggiorno', stay_dn:'Soggiorno · giorno {0} su {1}', st_fermata:'Fermata', sy_h:'Che cosa vogliono dire', sy_l_libera:'Libera', sy_l_dentro:'Parte oggi', sy_libera:'l\'ospite è uscito: puoi entrare e pulire', sy_dentro:'parte oggi ma è ancora in stanza: aspetta', sy_fermata:'l\'ospite resta: rifai senza cambiare le lenzuola', sy_controllo:'oggi arriva un ospite: controlla che sia tutto a posto', sy_change:'oggi tocca il cambio biancheria di quel soggiorno', sy_maint:'guasto segnalato e non ancora riparato', sy_fatta:'l\'hai già segnata pronta', st_partenza:'Partenza', st_dentro:'Parte oggi — ancora dentro', st_arrivo:'Arrivo', st_inpart:'In partenza', st_libera:'Libera — si può pulire', st_controllo:'Controllo', st_inwork:'In rifacimento', st_fatta:'Fatta',
   keys_h:'Programmazione chiavi', keys_lead:'{0} gruppi/nuclei · {1} stanze in arrivo · {2} chiavi da programmare. Programma insieme le chiavi dello stesso gruppo.',
   keys_rooms:'{0} stanze · {1} chiavi · arrivo {2}', keys_prog:'Programma chiavi', keys_done:'✓ Chiavi programmate', keys_singles:'Arrivi singoli', keys_group_anon:'Gruppo · {0} stanze', keys_roomlist:'Stanze del gruppo ({0})', keys_copy:'📋 Copia stanze', keys_copied:'{0} stanze copiate', keys_sign:'Consegnata a', keys_same_name:'stesso cognome', keys_prog_s:'Programma', keys_done_s:'✓ fatto',
   piani_prompt:'Digita il numero della stanza', open_room:'Apri stanza', your_rooms:'Le tue stanze di oggi', legend:'Legenda letti',
@@ -1184,7 +1191,7 @@ const I18N={
   dep_h:'Today’s departures', dep_h_day:'Departures', dep_lead:'Rooms being freed. The actual check-out will come from Slope.',
   co_done:'✓ checked out', co_todo:'leaving · check-out pending', co_mark:'✓ Mark as left', co_undo:'undo', co_unknown:'leaving · check-out status unknown', co_do:'Register check-out', none_arr:'No arrivals.', none_dep:'No departures.', pr_print:'🖨 Print', pr_note:'Notes & reminders', pr_balance:'Open balance', pr_status:'Status', pr_paid:'paid', pr_printed:'Printed on', pr_none:'—', pr_cart_title:'Linen to prepare for tomorrow', pr_totals:'Total to load on the cart', pr_cfg_tbd:'To be checked', pr_lav_all:'Total for the selected days', pr_reason:'Reason', pr_arr:'Arrival',
   rooms_h:'Room status', rooms_lead:'{0}/{1} ready · updated by Housekeeping in real time (in this demo, by switching department in the same window).',
-  st_ready:'Ready', st_wip:'In progress', st_todo:'To do', stay_short:'stay', stay_dn:'Stay · day {0} of {1}', st_fermata:'Stay-over', st_partenza:'Departure', st_dentro:'Leaving today — still in', st_arrivo:'Arrival', st_inpart:'Departing', st_libera:'Vacant — ready to clean', st_controllo:'Check', st_inwork:'Being cleaned', st_fatta:'Done',
+  st_ready:'Ready', st_wip:'In progress', st_todo:'To do', stay_short:'stay', stay_dn:'Stay · day {0} of {1}', st_fermata:'Stay-over', sy_h:'What they mean', sy_l_libera:'Free', sy_l_dentro:'Leaving today', sy_libera:'the guest has checked out: you can go in and clean', sy_dentro:'leaving today but still in the room: wait', sy_fermata:'the guest stays on: tidy without changing the sheets', sy_controllo:'a guest arrives today: check everything is in order', sy_change:'today is this stay\'s linen change', sy_maint:'fault reported and not yet repaired', sy_fatta:'you have already marked it ready', st_partenza:'Departure', st_dentro:'Leaving today — still in', st_arrivo:'Arrival', st_inpart:'Departing', st_libera:'Vacant — ready to clean', st_controllo:'Check', st_inwork:'Being cleaned', st_fatta:'Done',
   keys_h:'Key programming', keys_lead:'{0} groups/families · {1} arriving rooms · {2} keys to program. Program keys for the same group together.',
   keys_rooms:'{0} rooms · {1} keys · arrival {2}', keys_prog:'Program keys', keys_done:'✓ Keys programmed', keys_singles:'Single arrivals', keys_group_anon:'Group · {0} rooms', keys_roomlist:'Group rooms ({0})', keys_copy:'📋 Copy rooms', keys_copied:'{0} rooms copied', keys_sign:'Handed to', keys_same_name:'same surname', keys_prog_s:'Program', keys_done_s:'✓ done',
   piani_prompt:'Type the room number', open_room:'Open room', your_rooms:'Your rooms today', legend:'Bed legend',
@@ -1236,7 +1243,7 @@ const I18N={
   dep_h:'Plecările de azi', dep_h_day:'Plecări', dep_lead:'Camere care se eliberează. Check-out-ul efectiv va veni din Slope.',
   co_done:'✓ check-out efectuat', co_todo:'la plecare · check-out de făcut', co_mark:'✓ Marchează ieșit', co_undo:'anulează', co_unknown:'la plecare · stare check-out necunoscută', co_do:'Înregistrează check-out', none_arr:'Nicio sosire.', none_dep:'Nicio plecare.', pr_print:'🖨 Tipărește', pr_note:'Note și memento', pr_balance:'Sold deschis', pr_status:'Stare', pr_paid:'achitat', pr_printed:'Tipărit la', pr_none:'—', pr_cart_title:'Lenjerie de pregătit pentru mâine', pr_totals:'Total de încărcat pe cărucior', pr_cfg_tbd:'De verificat', pr_lav_all:'Total pentru zilele alese', pr_reason:'Motiv', pr_arr:'Sosire',
   rooms_h:'Starea camerelor', rooms_lead:'{0}/{1} gata · actualizat de Cameriste în timp real (în această demo, schimbând departamentul în aceeași fereastră).',
-  st_ready:'Gata', st_wip:'În curs', st_todo:'De făcut', stay_short:'sejur', stay_dn:'Sejur · ziua {0} din {1}', st_fermata:'Rămâne', st_partenza:'Plecare', st_dentro:'Pleacă azi — încă înăuntru', st_arrivo:'Sosire', st_inpart:'La plecare', st_libera:'Liberă — se poate curăța', st_controllo:'Verificare', st_inwork:'În refacere', st_fatta:'Gata',
+  st_ready:'Gata', st_wip:'În curs', st_todo:'De făcut', stay_short:'sejur', stay_dn:'Sejur · ziua {0} din {1}', st_fermata:'Rămâne', sy_h:'Ce înseamnă', sy_l_libera:'Liberă', sy_l_dentro:'Pleacă azi', sy_libera:'oaspetele a plecat: poți intra și curăța', sy_dentro:'pleacă azi, dar e încă în cameră: așteaptă', sy_fermata:'oaspetele rămâne: aranjează fără să schimbi cearceafurile', sy_controllo:'azi sosește un oaspete: verifică să fie totul în ordine', sy_change:'azi se face schimbul de lenjerie pentru acel sejur', sy_maint:'defecțiune semnalată și încă nereparată', sy_fatta:'ai marcat-o deja ca gata', st_partenza:'Plecare', st_dentro:'Pleacă azi — încă înăuntru', st_arrivo:'Sosire', st_inpart:'La plecare', st_libera:'Liberă — se poate curăța', st_controllo:'Verificare', st_inwork:'În refacere', st_fatta:'Gata',
   keys_h:'Programarea cheilor', keys_lead:'{0} grupuri/familii · {1} camere în sosire · {2} chei de programat. Programează împreună cheile aceluiași grup.',
   keys_rooms:'{0} camere · {1} chei · sosire {2}', keys_prog:'Programează cheile', keys_done:'✓ Chei programate', keys_singles:'Sosiri individuale', keys_group_anon:'Grup · {0} camere', keys_roomlist:'Camerele grupului ({0})', keys_copy:'📋 Copiază camerele', keys_copied:'{0} camere copiate', keys_sign:'Predată lui', keys_same_name:'același nume', keys_prog_s:'Programează', keys_done_s:'✓ gata',
   piani_prompt:'Introdu numărul camerei', open_room:'Deschide camera', your_rooms:'Camerele tale de azi', legend:'Legenda paturilor',
@@ -1288,7 +1295,7 @@ const I18N={
   dep_h:'Nisjet e sotme', dep_h_day:'Nisje', dep_lead:'Dhoma që lirohen. Check-out-i aktual do të vijë nga Slope.',
   co_done:'✓ dalje e kryer', co_todo:'në nisje · check-out për t’u bërë', co_mark:'✓ Shëno si i dalë', co_undo:'anulo', co_unknown:'në nisje · statusi i daljes i panjohur', co_do:'Regjistro check-out', none_arr:'Asnjë mbërritje.', none_dep:'Asnjë nisje.', pr_print:'🖨 Printo', pr_note:'Shënime & kujtesa', pr_balance:'Balancë e hapur', pr_status:'Statusi', pr_paid:'e paguar', pr_printed:'Printuar më', pr_none:'—', pr_cart_title:'Lino për të përgatitur për nesër', pr_totals:'Totali për të ngarkuar në karrocë', pr_cfg_tbd:'Për t’u verifikuar', pr_lav_all:'Totali i ditëve të zgjedhura', pr_reason:'Arsyeja', pr_arr:'Mbërritje',
   rooms_h:'Statusi i dhomave', rooms_lead:'{0}/{1} gati · përditësuar nga Pastrimi në kohë reale (në këtë demo, duke ndryshuar repartin në të njëjtën dritare).',
-  st_ready:'Gati', st_wip:'Në progres', st_todo:'Për t’u bërë', stay_short:'qëndrim', stay_dn:'Qëndrim · dita {0} nga {1}', st_fermata:'Qëndron', st_partenza:'Nisje', st_dentro:'Niset sot — ende brenda', st_arrivo:'Mbërritje', st_inpart:'Në nisje', st_libera:'E lirë — mund të pastrohet', st_controllo:'Kontroll', st_inwork:'Në pastrim', st_fatta:'U krye',
+  st_ready:'Gati', st_wip:'Në progres', st_todo:'Për t’u bërë', stay_short:'qëndrim', stay_dn:'Qëndrim · dita {0} nga {1}', st_fermata:'Qëndron', sy_h:'Çfarë do të thonë', sy_l_libera:'E lirë', sy_l_dentro:'Niset sot', sy_libera:'mysafiri ka dalë: mund të hysh dhe të pastrosh', sy_dentro:'niset sot por është ende në dhomë: prit', sy_fermata:'mysafiri qëndron: rregullo pa ndërruar çarçafët', sy_controllo:'sot vjen një mysafir: kontrollo që gjithçka të jetë në rregull', sy_change:'sot bëhet ndërrimi i linove për atë qëndrim', sy_maint:'defekt i sinjalizuar dhe ende i pariparuar', sy_fatta:'e ke shënuar tashmë si gati', st_partenza:'Nisje', st_dentro:'Niset sot — ende brenda', st_arrivo:'Mbërritje', st_inpart:'Në nisje', st_libera:'E lirë — mund të pastrohet', st_controllo:'Kontroll', st_inwork:'Në pastrim', st_fatta:'U krye',
   keys_h:'Programimi i çelësave', keys_lead:'{0} grupe/familje · {1} dhoma në mbërritje · {2} çelësa për t’u programuar. Programo bashkë çelësat e të njëjtit grup.',
   keys_rooms:'{0} dhoma · {1} çelësa · mbërritja {2}', keys_prog:'Programo çelësat', keys_done:'✓ Çelësat u programuan', keys_singles:'Mbërritje individuale', keys_group_anon:'Grup · {0} dhoma', keys_roomlist:'Dhomat e grupit ({0})', keys_copy:'📋 Kopjo dhomat', keys_copied:'{0} dhoma u kopjuan', keys_sign:'Dorëzuar te', keys_same_name:'i njëjti mbiemër', keys_prog_s:'Programo', keys_done_s:'✓ u krye',
   piani_prompt:'Shkruaj numrin e dhomës', open_room:'Hap dhomën', your_rooms:'Dhomat e tua sot', legend:'Legjenda e shtretërve',
@@ -2864,8 +2871,24 @@ function statusPill(s,rn){ const x=roomState(s,rn); return `<span class="status-
 let ROOMBUF='';
 function symIndex(){
   const chg=t('chip_change').replace('🔄 ','').replace('🔄','').trim();
-  const items=[['🧹',t('st_libera')],['🚪',t('st_dentro')],['🛑',t('st_fermata')],['🔎',t('st_controllo')],['🟢',t('sum_free')],['🔄',chg],['🔧',t('maint_chip')],['✓',t('st_fatta')]];
-  return `<div class="symidx">${items.map(([ic,l])=>`<span class="si"><span class="si-ic">${ic}</span>${l}</span>`).join('')}</div>`;
+  // Il pallino verde "Liberate" non c'e' piu': e' il contatore della reception
+  // e nell'elenco dei piani non compare mai. Spiegare un simbolo che non si
+  // incontra confonde piu' di quanto aiuti.
+  const items=[
+    ['🧹',t('sy_l_libera'),t('sy_libera')],
+    ['🚪',t('sy_l_dentro'),t('sy_dentro')],
+    ['🛑',t('st_fermata'),t('sy_fermata')],
+    ['🔎',t('st_controllo'),t('sy_controllo')],
+    ['🔄',chg,t('sy_change')],
+    ['🔧',t('maint_chip'),t('sy_maint')],
+    ['✓',t('st_fatta'),t('sy_fatta')],
+  ];
+  const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+  // Maiuscola iniziale qui e non nelle chiavi: quelle stesse parole servono
+  // anche dentro le frasi delle pastiglie di stato, dove la maiuscola stonerebbe.
+  const cap=x=>{const y=String(x);return y?y.charAt(0).toUpperCase()+y.slice(1):y;};
+  return `<div class="symidx"><div class="si-h">${t('sy_h')}</div>${items.map(([ic,l,d])=>
+    `<div class="si"><span class="si-ic">${ic}</span><span class="si-l">${esc(cap(l))}</span><span class="si-d">${esc(d)}</span></div>`).join('')}</div>`;
 }
 function viewPiani(){
   const d=DEMO[SESSION.prop]||{arrivi:[],partenze:[]};
@@ -4358,7 +4381,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-11-28.8';
+const APP_VERSIONE='2026-11-28.9';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
