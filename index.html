@@ -2875,12 +2875,13 @@ function viewPiani(){
     </div>
     <div class="keypad piani" id="roomPad"></div>
     <button class="go-btn" id="roomGo" disabled onclick="openRoom(ROOMBUF)">${t('open_room')}</button>
-    ${oggiBar()}${dayNotePostit(false)}${compitiPanel()}${symIndex()}
     <div class="assigned">
       <h4>${t('your_rooms')}${myFloors.length?` · ${myFloors.join(', ')}`:''}</h4>
       ${assigned.map(r=>{const s=roomStatus(r);const info=roomInfo(r);const cfgObj=info.arr||info.stay;const change=info.stay&&isChangeDay(info.stay.dayOfStay,info.stay.nights);const done=s.state==='ready';const freed=info.dep&&info.dep.checkout;const mq=MAINT[SESSION.prop]&&MAINT[SESSION.prop][r];const reassigned=myOv[r]===SESSION.name;const rowcl=done?'done':(freed?'freed':(info.stay?'staybar':(info.arr?'ctrlbar':'occ')));return `<div class="aroom ${rowcl}" onclick="openRoom('${r}')"><div class="n">${r}</div><div class="a-beds">${cfgObj?bedIcons(cfgObj.config,cfgObj.type,'sm'):'—'}</div><div class="a-flags">${change?'<span class="fl" title="'+t('chip_change')+'">🔄</span>':''}${mq?'<span class="fl" title="'+t('maint_chip')+'">🔧</span>':''}${reassigned?'<span class="fl" title="'+t('workload_sugg_h')+'">🔀</span>':''}</div>${done?'<span class="status-pill fatta">✓ '+t('st_fatta')+'</span>':statusPill(s,r)}</div>`;}).join('')}
     </div>
+    ${symIndex()}
     ${pianiRoomChangeBlock(myFloors)}
+    ${oggiBar()}${dayNotePostit(false)}${compitiPanel()}
     <details class="bedlegend">
       <summary>${t('legend')}</summary>
       ${BEDLEGEND.map(([name,cfg])=>`<div class="legrow"><div class="lg-ic">${bedIcons(cfg,'','sm')}</div><div class="lg-name">${name}</div></div>`).join('')}
@@ -4347,7 +4348,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-11-28.5';
+const APP_VERSIONE='2026-11-28.6';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
