@@ -2232,16 +2232,33 @@ function postitFit(){
 // "Fatto" significa inseguire un bottone che scorre. Un tocco ferma il nastro.
 function tickerPausa(vp){ const tr=vp.querySelector('.tk-track'); if(!tr)return; vp.classList.toggle('ferma'); }
 function tickerFit(){ document.querySelectorAll('.tk-vp').forEach(vp=>{ const tr=vp.querySelector('.tk-track'); if(!tr||tr.dataset.fit)return; const w=tr.scrollWidth, vpw=vp.clientWidth; if(w>vpw+4){ tr.innerHTML=tr.innerHTML+tr.innerHTML; tr.style.animationDuration=Math.max(16,Math.round(w/45))+'s'; tr.classList.add('run'); } tr.dataset.fit='1'; }); }
+/* Posizione della pagina fra un ridisegno e l'altro.
+   renderModule() rifa' tutto il corpo e finiva sempre con scrollTo(0,0): ogni
+   bottone — aprire un modulo, segnare una stanza pronta, togliere un avviso —
+   rimandava in cima, e chi stava in fondo all'elenco doveva riscorrere ogni
+   volta. Si torna in cima solo quando cambia davvero la vista (reparto o
+   struttura), che e' il caso in cui ripartire dall'alto ha senso. */
+var VISTA_CORRENTE='';
 function renderModule(){
   document.getElementById('modSub').textContent=giornoEtichetta(0)+' · '+((PROPS.find(p=>p.id===SESSION.prop)||{}).full||'')+(typeof scatolaStamp==='function'?' · '+scatolaStamp():'')+(typeof APP_VERSIONE!=='undefined'?' · v'+APP_VERSIONE:'');
   const bell=document.getElementById('tbBell'); if(bell) bell.innerHTML=dailyTaskBell();
   document.querySelectorAll('#propSwitch button').forEach(b=>b.classList.toggle('on',b.textContent===(PROPS.find(p=>p.id===SESSION.prop)||{}).name));
   const b=document.getElementById('modBody');
+  const vista=SESSION.role+'|'+SESSION.prop;
+  const cambiaVista=(vista!==VISTA_CORRENTE);
+  const y=window.scrollY||document.documentElement.scrollTop||0;
   if(SESSION.role==='reception') b.innerHTML=viewReception();
   else if(SESSION.role==='piani') b.innerHTML=viewPiani();
   else if(SESSION.role==='lavanderia') b.innerHTML=viewLavanderia();
   else b.innerHTML=viewBackoffice();
-  window.scrollTo(0,0);
+  VISTA_CORRENTE=vista;
+  if(cambiaVista){ window.scrollTo(0,0); }
+  else if(y){
+    window.scrollTo(0,y);
+    // Secondo tentativo a layout finito: se il contenuto nuovo e' piu' alto o
+    // piu' basso, il browser corregge da se' e il primo salto si vedrebbe.
+    requestAnimationFrame(function(){ window.scrollTo(0,y); });
+  }
   requestAnimationFrame(tickerFit);
   requestAnimationFrame(postitFit);
 }
@@ -2499,7 +2516,7 @@ function setRecTab(t){ RECTAB=t; renderModule(); }
    funzioni ma ne usa una per volta, e tenerle tutte aperte riempiva lo schermo
    di campi vuoti. Chiuse, il riquadro e' una riga. */
 var RA_TAB='';
-function raTab(k){ RA_TAB=(RA_TAB===k?'':k); renderModule();
+function raTab(k){ RA_TAB=(RA_TAB===k?'':k); renderModule();   // la posizione la tiene renderModule
   // il campo giusto gia' pronto sotto le dita: una digitazione in meno
   setTimeout(function(){ const f={msg:'recMsg',guasto:'rfRoom',lost:'lfRoom'}[k];
     const el=f&&document.getElementById(f); if(el&&RA_TAB===k) el.focus(); },60);
@@ -4501,7 +4518,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-11-28.13';
+const APP_VERSIONE='2026-11-28.14';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
