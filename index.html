@@ -846,7 +846,7 @@ function seedRooms(){
 }
 // COLLABORATORI (PIN, ruolo, struttura di accesso; '*' = tutte)
 function seedCollab(){ return [
-  {pin:'9999',name:'Direzione',role:'admin',prop:'*',lang:'it'},
+  {pin:'1209',name:'Direzione',role:'admin',prop:'*',lang:'it'},
   {pin:'1979',name:'Reception Saslong',role:'reception',prop:'saslong',lang:'it'},
   {pin:'1980',name:'Reception Hartmann',role:'reception',prop:'hartmann',lang:'it'},
   {pin:'2201',name:'Anna',role:'piani',prop:'saslong',lang:'it',floors:['1° Piano']},
@@ -4358,7 +4358,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-11-28.7';
+const APP_VERSIONE='2026-11-28.8';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
