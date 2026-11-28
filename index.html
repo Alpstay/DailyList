@@ -2041,7 +2041,13 @@ function bedIcons(config,type,cls){
 function bedName(config,type){
   const b=parseBeds(config,type),k=b.matr+'-'+b.sing+'-'+b.cast;
   const bk='bn_'+k.replace(/-/g,'_'); if(I18N.it[bk]!==undefined)return t(bk);
-  const p=[]; if(b.matr)p.push(b.matr+' matrimoniale'+(b.matr>1?'i':'')); if(b.sing)p.push(b.sing+' singolo'+(b.sing>1?'i':'')); if(b.cast)p.push(b.cast+' a castello'); return p.join(' + ')||'—';
+  // Il plurale non si fa aggiungendo una 'i': l'ultima vocale cade. Prima
+  // usciva "2 matrimonialei" e "2 singoloi" su ogni stanza con piu' letti.
+  const p=[];
+  if(b.matr)p.push(b.matr+(b.matr>1?' matrimoniali':' matrimoniale'));
+  if(b.sing)p.push(b.sing+(b.sing>1?' singoli':' singolo'));
+  if(b.cast)p.push(b.cast+' a castello');
+  return p.join(' + ')||'—';
 }
 const BEDLEGEND=[['Matrimoniale','1 matrimoniale'],['Singola','1 singolo'],['Doppia a letti separati','2 singoli'],['Tripla · matrimoniale + letto aggiunto','1 matrimoniale 1 singolo'],['Tripla · 3 letti separati','3 singoli'],['Quadrupla · matrimoniale + castello','1 matrimoniale 1 castello'],['Quadrupla · 2 letti a castello','2 a castello'],['Quadrupla · 2 separati + castello','2 singoli 1 castello']];
 // Se la stanza ieri era libera e oggi è occupata -> controllo consigliato
@@ -4530,7 +4536,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-11-28.15';
+const APP_VERSIONE='2026-11-28.16';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
