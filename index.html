@@ -243,24 +243,34 @@ h2.sec{font-family:var(--display);font-weight:700;font-size:19px;margin:0 0 2px}
 .ck-score{font-family:var(--display);font-weight:700;font-size:12.5px;color:var(--muted);text-align:right}
 .ck-miss{font-size:11.5px;color:var(--muted);line-height:1.3;min-width:0;overflow-wrap:anywhere}
 @media(max-width:700px){ .ck-row{grid-template-columns:1fr 44px;row-gap:5px} .ck-bar{grid-column:1/3} .ck-miss{grid-column:1/3} }
-/* Il pannello che la signora vede: la check list di oggi, da spuntare col dito. */
-.ck-panel{border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:0;margin:4px 0 13px;overflow:hidden}
-.ck-panel>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;padding:11px 13px;font-family:var(--display);font-weight:700;font-size:15px;color:var(--ink)}
-.ck-panel>summary::-webkit-details-marker{display:none}
-.ck-panel>summary::after{content:'▾';margin-left:auto;color:var(--muted2);font-size:13px}
-.ck-panel[open]>summary::after{content:'▴'}
-.ck-panel.allok{border-color:var(--green);background:var(--green-bg)}
-.ck-ok{font-family:var(--display);font-weight:700;font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--green)}
+/* Il pannello che la signora vede: i suoi compiti e la guida del reparto,
+   con le sezioni che si aprono e chiudono con la freccia. */
+.ck-panel{border:1px solid var(--line);border-radius:14px;background:var(--paper);padding:0 0 9px;margin:4px 0 13px;overflow:hidden}
+.ck-cap{display:flex;align-items:center;gap:9px;padding:11px 13px 7px;font-family:var(--display);font-weight:700;font-size:15px;color:var(--ink)}
 .ck-sub{font-family:var(--display);font-weight:700;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);padding:0 13px;margin:3px 0 5px}
 .ck-base{padding-bottom:7px}
 .ck-ul{margin:0;padding:0 13px 0 30px;font-size:13.5px;line-height:1.45;color:var(--slate)}
-.ck-items{display:flex;flex-direction:column;gap:1px;padding:0 0 9px}
-.ck-item{appearance:none;width:100%;text-align:left;display:flex;align-items:center;gap:11px;border:0;border-top:1px solid var(--line2);background:transparent;padding:11px 13px;cursor:pointer;font-family:var(--body);font-size:14.5px;color:var(--ink);line-height:1.3}
-.ck-box{flex:0 0 25px;height:25px;border:1.5px solid var(--line);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;background:var(--paper)}
-.ck-item.on .ck-box{background:var(--green);border-color:var(--green)}
-.ck-item.on .ck-txt{color:var(--muted);text-decoration:line-through}
-.ck-txt{flex:1 1 auto;min-width:0;overflow-wrap:anywhere}
-.ck-time{flex:0 0 auto;font-family:var(--display);font-weight:700;font-size:11px;color:var(--green)}
+.gd-list{display:flex;flex-direction:column;gap:1px}
+.gd-sez{border-top:1px solid var(--line2)}
+.gd-sez>summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:9px;padding:13px;font-family:var(--display);font-weight:700;font-size:14.5px;letter-spacing:.02em;color:var(--ink)}
+.gd-sez>summary::-webkit-details-marker{display:none}
+.gd-sez>summary::before{content:'▸';color:var(--acc);font-size:13px;flex:0 0 11px;transition:transform .15s}
+.gd-sez[open]>summary::before{transform:rotate(90deg)}
+.gd-sez[open]>summary{background:var(--snow)}
+.gd-n{margin-left:auto;font-family:var(--display);font-weight:700;font-size:11px;color:var(--muted);background:var(--snow);border-radius:20px;padding:1px 8px}
+.gd-sez[open]>summary .gd-n{background:var(--paper)}
+.gd-body{padding:3px 13px 11px}
+.gd-sub{font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--acc);margin:9px 0 3px}
+.gd-ul{margin:0;padding-left:19px;font-size:14px;line-height:1.5;color:var(--slate)}
+.gd-ul li{margin-bottom:3px;overflow-wrap:anywhere}
+/* Redattore: testo a sinistra, anteprima di come verra' letto. */
+.gd-ta{font-family:var(--body);font-size:12.5px;line-height:1.45;min-height:150px}
+.gp-h{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:9px 0 3px}
+.gp-box{border:1px dashed var(--line);border-radius:9px;background:var(--snow);padding:7px 9px;max-height:190px;overflow:auto}
+.gp-sez{font-family:var(--display);font-weight:700;font-size:12.5px;color:var(--ink);margin-top:5px}
+.gp-sez:first-child{margin-top:0}
+.gp-sub{font-family:var(--display);font-weight:600;font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--acc);margin-left:13px}
+.gp-n{font-size:11px;color:var(--muted);margin-left:13px}
 .daily-alert{display:flex;align-items:center;gap:9px;background:linear-gradient(135deg,#e23b2e,#c22a1e);color:#fff;border-radius:12px;padding:8px 11px;margin-bottom:9px;box-shadow:0 5px 14px rgba(194,42,30,.26)}
 .da-ic{font-size:19px;flex-shrink:0;animation:tkpulse 1.3s infinite}
 .da-text{flex:1;font-size:12px;line-height:1.28}
@@ -860,85 +870,97 @@ const getRoom=(prop,rn)=>(ROOMS_DB[prop]||[]).find(r=>r.rn===String(rn));
 const pinLookup=pin=>COLLAB.find(c=>c.pin===pin);
 
 /* ---------------------------------------------------------
-   COMPITI DI BASE e CHECK LIST GIORNALIERA
-   Due cose diverse, e tenerle separate e' il punto:
-   - la CHECK LIST e' fissa e si scrive UNA volta per reparto. E' uguale ogni
-     giorno e uguale per tutte: se fosse per persona, la Direzione riscriverebbe
-     lo stesso testo per ogni signora e a ogni cambio dovrebbe correggere ogni
-     riga. Le spunte invece sono personali e ripartono da zero ogni giorno.
-   - i COMPITI DI BASE sono per persona e servono a cio' che la distingue
-     (i suoi piani, la sua mansione). Testo libero, una riga per compito.
-   Ogni voce della check list porta un id proprio: se la Direzione corregge il
-   testo di una voce, le spunte di oggi restano attaccate alla voce giusta.
+   COMPITI — quello che ogni persona deve sapere a memoria.
+   Due cose, tenute separate:
+   - la GUIDA del reparto: il modo di fare le stanze, uguale per tutte. E' un
+     manuale di procedura, non una lista da spuntare: trentacinque voci nessuno
+     le tocca una per una ogni mattina. Si legge, e si apre solo la parte che
+     serve in quel momento.
+   - i COMPITI DI BASE della singola persona: cio' che la distingue, i suoi
+     piani, la sua mansione. Testo libero, una riga per compito.
+   La guida si scrive come la si scriverebbe su carta, e si classifica da se':
+     riga TUTTA MAIUSCOLA  -> sezione che si apre e chiude con la freccia
+     riga che finisce con : -> sottotitolo dentro la sezione
+     ogni altra riga        -> una voce
+   Cosi' la Direzione incolla il testo come ce l'ha, senza imparare simboli.
    --------------------------------------------------------- */
-function newCid(){ return 'c'+Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+const GUIDA_PIANI=`FERMATA
+Camera:
+Passare aspirapolvere dappertutto (! sotto letto) + fare attenzione speciale se c'è cane (peli)
+Passare pavimento con mop bagnato alla fine
+cambiare copricuscini
+Lavare i bicchieri
+Arieggiare camera
+Rifare letti
+Più di 3 giorni: fare cambio biancheria + lenzuola + letto + asciugamani
+Controllare balconi e togliere spazzatura
+Bagno:
+svuotare bidone
+ASCIUGAMANI: a terra (cambiare) – appesi e puliti: lasciare
+
+PARTENZA – ARRIVO
+Camera:
+Controllare che cavo tv sia inserito in presa e cavi non siano in vista
+Chiudere cerniera topper letto
+Pulire vetrina (polvere)
+Passare aspirapolvere dappertutto (! sotto letto) + fare attenzione speciale se c'era cane (peli)
+Passare pavimento con mop bagnato alla fine
+Lavare bicchieri
+Pulire frigo
+Svuotare secchio spazzatura
+Pulire termosifoni – tanta polvere
+Pulire battiscopa nelle camere
+Pulire balconi
+Odore di fumo? mandare messaggio reception + mettere ozono 2x
+Bagno:
+Controllare saponi: uno a persona per ogni tipo
+2, 3 o 4 persone – set asciugamani
+Pulire scarico doccia bagno – tappo viola
+Pulire tappo lavandino
+
+GIORNALIERO:
+Ognuno compito proprio (giroscale, bagni pubblici, lavanderia)
+Corridoio: passare aspirapolvere + togliere polvere sopra luci
+Oggetti smarriti: pubblicare foto
+Fine turno: ricontrollare ogni camera – disposizione letti corretto come su applicazione?`;
 function seedCompiti(){ return {
-  lista:{
-    piani:[
-      {id:'c_pi1',txt:'Controlla il carrello: biancheria, prodotti, sacchi'},
-      {id:'c_pi2',txt:'Guarda i tuoi piani in app e parti dalle stanze libere'},
-      {id:'c_pi3',txt:'Segna “pronta” ogni stanza appena finita'},
-      {id:'c_pi4',txt:'Segnala guasti e oggetti smarriti dall\'app, non a voce'},
-      {id:'c_pi5',txt:'Riporta la biancheria sporca in lavanderia'},
-      {id:'c_pi6',txt:'Lascia il carrello rifornito per domani'},
-    ],
-    reception:[
-      {id:'c_re1',txt:'Controlla arrivi e partenze del giorno'},
-      {id:'c_re2',txt:'Registra i check-out appena consegnano la chiave'},
-      {id:'c_re3',txt:'Prepara le chiavi dei gruppi in arrivo'},
-      {id:'c_re4',txt:'Passa ai piani le stanze da fare per prime'},
-    ],
-    lavanderia:[
-      {id:'c_la1',txt:'Stampa il fabbisogno biancheria del giorno'},
-      {id:'c_la2',txt:'Prepara i carrelli per piano'},
-      {id:'c_la3',txt:'Conta e separa la biancheria rientrata'},
-    ],
+  guida:{
+    piani:GUIDA_PIANI,
+    reception:'',
+    lavanderia:'',
   },
   pers:{},
 }; }
 let COMPITI=LS.get('abo_compiti',null)||seedCompiti();
 function compitiNorm(src){
   const o=src&&typeof src==='object'?src:{};
-  const l=o.lista&&typeof o.lista==='object'?o.lista:{};
-  return {lista:{piani:Array.isArray(l.piani)?l.piani:[],reception:Array.isArray(l.reception)?l.reception:[],lavanderia:Array.isArray(l.lavanderia)?l.lavanderia:[]},
+  const g=o.guida&&typeof o.guida==='object'?o.guida:{};
+  return {guida:{piani:String(g.piani||''),reception:String(g.reception||''),lavanderia:String(g.lavanderia||'')},
           pers:o.pers&&typeof o.pers==='object'?o.pers:{}};
 }
 COMPITI=compitiNorm(COMPITI);
 const saveCompiti=()=>{ LS.set('abo_compiti',COMPITI); if(fdb){try{fdb.ref('console/compiti').set(COMPITI);}catch(e){}} };
-const checkLista=role=>(COMPITI.lista[role]||[]).filter(v=>v&&v.id&&String(v.txt||'').trim());
 // Compiti di base di una persona: righe non vuote del testo libero.
 const compitiDi=name=>String((COMPITI.pers||{})[name]||'').split('\n').map(s=>s.trim()).filter(Boolean);
-
-// SPUNTE del giorno: {prop:{nome:{giorno:'AAAA-MM-GG', fatti:{idVoce:'HH:MM'}}}}
-// Condivise, cosi' la Direzione vede chi ha chiuso la lista senza telefonare.
-let CHECKDONE=LS.get('abo_checkdone',null)||{saslong:{},hartmann:{},acadia:{}};
-function checkPulisci(src){
-  const oggi=(typeof scatolaOggi==='function')?scatolaOggi():'';
-  const out={saslong:{},hartmann:{},acadia:{}};
-  Object.keys(out).forEach(pr=>{
-    const m=(src||{})[pr]||{};
-    Object.keys(m).forEach(n=>{
-      const v=m[n]; if(!v) return;
-      if(v.giorno&&oggi&&v.giorno!==oggi) return;   // lista di ieri: oggi riparte da zero
-      out[pr][n]={giorno:v.giorno||'',fatti:(v.fatti&&typeof v.fatti==='object')?v.fatti:{}};
-    });
+// Dal testo alla struttura. Una riga senza nessuna lettera minuscola e' un
+// titolo di sezione: e' il modo in cui le procedure sono gia' scritte a mano,
+// e regge anche righe come "ASCIUGAMANI: a terra (cambiare)", che minuscole ne
+// hanno e quindi restano voci, non diventano titoli.
+function guidaParse(txt){
+  const out=[]; let sez=null, grp=null;
+  const apriSez=tit=>{ sez={tit:tit,blocchi:[]}; out.push(sez); grp=null; };
+  const apriGrp=sub=>{ if(!sez) apriSez(''); grp={sub:sub,voci:[]}; sez.blocchi.push(grp); };
+  String(txt||'').split('\n').forEach(riga=>{
+    const s=riga.trim(); if(!s) return;
+    const pulita=s.replace(/:$/,'').trim();
+    if(!/[a-zà-öø-ÿ]/.test(s)){ apriSez(pulita); return; }   // nessuna minuscola
+    if(/:$/.test(s)){ apriGrp(pulita); return; }
+    if(!grp) apriGrp('');
+    grp.voci.push(s.replace(/^[-–•*]\s*/,''));
   });
-  return out;
+  return out.filter(x=>x.blocchi.some(b=>b.voci.length));
 }
-CHECKDONE=checkPulisci(CHECKDONE);   // la copia locale puo' essere di ieri
-const checkFattiDi=(prop,name)=>(((CHECKDONE[prop]||{})[name]||{}).fatti)||{};
-function checkToggle(id){
-  const prop=SESSION.prop, name=SESSION.name||'';
-  if(!name||!id) return;
-  const cur=checkFattiDi(prop,name), fatti={};
-  Object.keys(cur).forEach(k=>{ fatti[k]=cur[k]; });
-  if(fatti[id]) delete fatti[id]; else fatti[id]=nowHM();
-  const rec={giorno:scatolaOggi(),fatti};
-  (CHECKDONE[prop]=CHECKDONE[prop]||{})[name]=rec;
-  LS.set('abo_checkdone',CHECKDONE);
-  if(fdb){try{ fdb.ref('checkdone/'+prop+'/'+name).set(rec); }catch(e){}}
-  buzz(30); renderModule();
-}
+const guidaDi=role=>guidaParse((COMPITI.guida||{})[role]||'');
 
 /* =========================================================
    MULTILINGUA (it · en · ro · sq)
@@ -986,13 +1008,12 @@ const I18N={
   th_n:'N.', th_floor:'Piano', th_balc:'Balcone', th_bidet:'Bidet', th_com:'Comunic.', th_note:'Note',
   bo_collab_h:'Collaboratori & accessi', bo_collab_lead:'Ogni collaboratore entra col proprio PIN solo nel reparto e nella struttura assegnata. “Tutte le strutture” = può cambiare struttura.', bo_add:'+ Aggiungi',
   bo_compiti:'Compiti', bo_compiti_h:'Compiti di base & check list', bo_compiti_lead:'La check list è fissa: la scrivi una volta per reparto e ogni giorno riparte da zero per tutte. I compiti di base sono della singola persona e servono per ciò che la distingue: i suoi piani, la sua mansione.',
-  ck_lista_h:'Check list fissa giornaliera', ck_lista_lead:'Una riga per voce, nell\'ordine in cui va fatta. Chi entra la trova spuntabile, e le spunte ripartono a mezzanotte.',
-  ck_add:'+ Aggiungi voce', ck_voce_ph:'es. Controlla il carrello', ck_vuota:'Nessuna voce: il reparto non vedrà la check list.',
+  ck_guida_h:'Guida del reparto', ck_guida_lead:'Il modo di fare le stanze, uguale per tutte. Scrivilo come lo scriveresti su carta: una riga TUTTA MAIUSCOLA diventa una sezione che si apre e chiude con la freccia, una riga che finisce con i due punti diventa un sottotitolo, ogni altra riga è una voce. L\'anteprima a destra mostra subito come verrà letta.',
+  ck_voci:'voci', ck_prev:'Come la vedranno', ck_vuota:'Niente di scritto: il reparto non vedrà nessuna guida.', ck_guida_ph:'FERMATA\nCamera:\nPassare aspirapolvere dappertutto\nRifare letti\nBagno:\nsvuotare bidone',
   ck_pers_h:'Compiti di base per persona', ck_pers_lead:'Testo libero, una riga per compito. Lo vede solo lei, insieme alla check list del suo reparto.',
   ck_pers_ph:'es. 1° e 2° piano\nControllo frigobar al 2°', ck_none_pers:'Nessun compito di base scritto.',
-  ck_mine_h:'I miei compiti', ck_mine_base:'I tuoi compiti di base', ck_mine_list:'Check list di oggi',
-  ck_done_all:'Check list completata', ck_at:'alle', ck_oggi_h:'Check list di oggi', ck_oggi_lead:'Chi ha chiuso la lista e chi no, senza telefonare.',
-  ck_nessuno:'Nessun collaboratore con check list in questa struttura.', ck_niente:'non ha ancora iniziato',
+  ck_mine_h:'I miei compiti', ck_mine_base:'I tuoi compiti di base', ck_mine_guida:'Come si fanno le stanze',
+  ck_nessuno:'Nessun collaboratore con check list in questa struttura.',
   th_name:'Nome', th_dept:'Reparto', th_prop:'Struttura', th_lang:'Lingua', all_props:'Tutte le strutture', all_short:'Tutte',
   add_num:'Numero', add_floor:'Piano', add_type:'Tipo', add_dept:'Reparto', add_pin:'PIN', add_name:'Nome',
   tk_var:'Variazioni', tk_toread:'{0} da leggere', tk_done:'Fatto', tk_empty:'Nessuna variazione da leggere.',
@@ -1039,13 +1060,12 @@ const I18N={
   th_n:'No.', th_floor:'Floor', th_balc:'Balcony', th_bidet:'Bidet', th_com:'Connect.', th_note:'Notes',
   bo_collab_h:'Staff & access', bo_collab_lead:'Each person signs in with their PIN only for their department and assigned property. “All properties” = can switch property.', bo_add:'+ Add',
   bo_compiti:'Duties', bo_compiti_h:'Basic duties & checklist', bo_compiti_lead:'The checklist is fixed: write it once per department and it starts again from zero every day, the same for everyone. Basic duties belong to one person and cover what sets her apart: her floors, her job.',
-  ck_lista_h:'Fixed daily checklist', ck_lista_lead:'One line per item, in the order it should be done. Everyone finds it tickable, and ticks reset at midnight.',
-  ck_add:'+ Add item', ck_voce_ph:'e.g. Check the trolley', ck_vuota:'No items: the department will not see a checklist.',
+  ck_guida_h:'Department guide', ck_guida_lead:'How the rooms are done, the same for everyone. Write it as you would on paper: a line in ALL CAPITALS becomes a section that opens and closes with the arrow, a line ending in a colon becomes a sub-heading, every other line is an item. The preview shows at once how it will read.',
+  ck_voci:'items', ck_prev:'How they will see it', ck_vuota:'Nothing written: the department will see no guide.', ck_guida_ph:'STAY-OVER\nRoom:\nVacuum everywhere\nMake the beds\nBathroom:\nempty the bin',
   ck_pers_h:'Basic duties per person', ck_pers_lead:'Free text, one line per duty. Only she sees it, next to her department checklist.',
   ck_pers_ph:'e.g. 1st and 2nd floor\nMinibar check on the 2nd', ck_none_pers:'No basic duties written.',
-  ck_mine_h:'My duties', ck_mine_base:'Your basic duties', ck_mine_list:'Today\'s checklist',
-  ck_done_all:'Checklist completed', ck_at:'at', ck_oggi_h:'Today\'s checklist', ck_oggi_lead:'Who closed the list and who did not, without phoning.',
-  ck_nessuno:'No staff with a checklist in this property.', ck_niente:'has not started yet',
+  ck_mine_h:'My duties', ck_mine_base:'Your basic duties', ck_mine_guida:'How the rooms are done',
+  ck_nessuno:'No staff with a checklist in this property.',
   th_name:'Name', th_dept:'Department', th_prop:'Property', th_lang:'Language', all_props:'All properties', all_short:'All',
   add_num:'Number', add_floor:'Floor', add_type:'Type', add_dept:'Department', add_pin:'PIN', add_name:'Name',
   tk_var:'Changes', tk_toread:'{0} to read', tk_done:'Done', tk_empty:'No changes to read.',
@@ -1092,13 +1112,12 @@ const I18N={
   th_n:'Nr.', th_floor:'Etaj', th_balc:'Balcon', th_bidet:'Bideu', th_com:'Comunic.', th_note:'Note',
   bo_collab_h:'Colaboratori & acces', bo_collab_lead:'Fiecare intră cu PIN-ul propriu doar în departamentul și structura alocată. „Toate structurile” = poate schimba structura.', bo_add:'+ Adaugă',
   bo_compiti:'Sarcini', bo_compiti_h:'Sarcini de bază & check list', bo_compiti_lead:'Check lista este fixă: o scrii o dată pentru departament și în fiecare zi pornește de la zero, aceeași pentru toate. Sarcinile de bază sunt ale persoanei și acoperă ce o deosebește: etajele ei, munca ei.',
-  ck_lista_h:'Check list fixă zilnică', ck_lista_lead:'O linie pentru fiecare punct, în ordinea în care se face. Fiecare o găsește de bifat, iar bifele pornesc din nou la miezul nopții.',
-  ck_add:'+ Adaugă punct', ck_voce_ph:'ex. Verifică căruciorul', ck_vuota:'Niciun punct: departamentul nu va vedea check lista.',
+  ck_guida_h:'Ghidul departamentului', ck_guida_lead:'Cum se fac camerele, la fel pentru toate. Scrie-l cum l-ai scrie pe hârtie: o linie TOATĂ CU MAJUSCULE devine o secțiune care se deschide și se închide cu săgeata, o linie care se termină cu două puncte devine un subtitlu, orice altă linie este un punct. Previzualizarea arată imediat cum va fi citit.',
+  ck_voci:'puncte', ck_prev:'Cum vor vedea', ck_vuota:'Nimic scris: departamentul nu va vedea niciun ghid.', ck_guida_ph:'OPRIRE\nCameră:\nAspiră peste tot\nFă paturile\nBaie:\ngolește coșul',
   ck_pers_h:'Sarcini de bază pentru fiecare', ck_pers_lead:'Text liber, o linie pentru fiecare sarcină. O vede doar ea, lângă check lista departamentului.',
   ck_pers_ph:'ex. Etajul 1 și 2\nControl minibar la etajul 2', ck_none_pers:'Nicio sarcină de bază scrisă.',
-  ck_mine_h:'Sarcinile mele', ck_mine_base:'Sarcinile tale de bază', ck_mine_list:'Check lista de azi',
-  ck_done_all:'Check list terminată', ck_at:'la', ck_oggi_h:'Check lista de azi', ck_oggi_lead:'Cine a închis lista și cine nu, fără telefon.',
-  ck_nessuno:'Niciun colaborator cu check list în această structură.', ck_niente:'încă nu a început',
+  ck_mine_h:'Sarcinile mele', ck_mine_base:'Sarcinile tale de bază', ck_mine_guida:'Cum se fac camerele',
+  ck_nessuno:'Niciun colaborator cu check list în această structură.',
   th_name:'Nume', th_dept:'Departament', th_prop:'Structură', th_lang:'Limbă', all_props:'Toate structurile', all_short:'Toate',
   add_num:'Număr', add_floor:'Etaj', add_type:'Tip', add_dept:'Departament', add_pin:'PIN', add_name:'Nume',
   tk_var:'Modificări', tk_toread:'{0} de citit', tk_done:'Gata', tk_empty:'Nicio modificare de citit.',
@@ -1145,13 +1164,12 @@ const I18N={
   th_n:'Nr.', th_floor:'Kati', th_balc:'Ballkon', th_bidet:'Bide', th_com:'Komunik.', th_note:'Shënime',
   bo_collab_h:'Stafi & aksesi', bo_collab_lead:'Secili hyn me PIN-in e vet vetëm në repartin dhe strukturën e caktuar. „Të gjitha strukturat” = mund të ndryshojë strukturën.', bo_add:'+ Shto',
   bo_compiti:'Detyrat', bo_compiti_h:'Detyrat bazë & check lista', bo_compiti_lead:'Check lista është e fiksuar: e shkruan një herë për repartin dhe çdo ditë niset nga zero, e njëjtë për të gjitha. Detyrat bazë janë të personit dhe mbulojnë atë që e dallon: katet e saj, puna e saj.',
-  ck_lista_h:'Check lista e fiksuar e ditës', ck_lista_lead:'Një rresht për çdo pikë, sipas radhës si duhet bërë. Secila e gjen për ta shënuar, dhe shënimet nisen nga e para në mesnatë.',
-  ck_add:'+ Shto pikë', ck_voce_ph:'p.sh. Kontrollo karrocën', ck_vuota:'Asnjë pikë: reparti nuk do të shohë check listën.',
+  ck_guida_h:'Udhëzuesi i repartit', ck_guida_lead:'Si bëhen dhomat, njësoj për të gjitha. Shkruaje si do ta shkruaje në letër: një rresht KRYESISHT ME SHKRONJA TË MËDHA bëhet një seksion që hapet dhe mbyllet me shigjetë, një rresht që mbaron me dy pika bëhet nëntitull, çdo rresht tjetër është një pikë. Parashikimi tregon menjëherë si do të lexohet.',
+  ck_voci:'pika', ck_prev:'Si do ta shohin', ck_vuota:'Asgjë e shkruar: reparti nuk do të shohë asnjë udhëzues.', ck_guida_ph:'QËNDRIM\nDhoma:\nFshi me fshesë kudo\nRregullo krevatet\nBanjo:\nzbraz koshin',
   ck_pers_h:'Detyrat bazë për person', ck_pers_lead:'Tekst i lirë, një rresht për detyrë. E shikon vetëm ajo, pranë check listës së repartit.',
   ck_pers_ph:'p.sh. Kati 1 dhe 2\nKontroll minibar në katin 2', ck_none_pers:'Asnjë detyrë bazë e shkruar.',
-  ck_mine_h:'Detyrat e mia', ck_mine_base:'Detyrat e tua bazë', ck_mine_list:'Check lista e sotme',
-  ck_done_all:'Check lista u plotësua', ck_at:'në', ck_oggi_h:'Check lista e sotme', ck_oggi_lead:'Kush e mbylli listën dhe kush jo, pa telefonuar.',
-  ck_nessuno:'Asnjë bashkëpunëtor me check list në këtë strukturë.', ck_niente:'nuk ka nisur ende',
+  ck_mine_h:'Detyrat e mia', ck_mine_base:'Detyrat e tua bazë', ck_mine_guida:'Si bëhen dhomat',
+  ck_nessuno:'Asnjë bashkëpunëtor me check list në këtë strukturë.',
   th_name:'Emri', th_dept:'Reparti', th_prop:'Struktura', th_lang:'Gjuha', all_props:'Të gjitha strukturat', all_short:'Të gjitha',
   add_num:'Numri', add_floor:'Kati', add_type:'Tipi', add_dept:'Reparti', add_pin:'PIN', add_name:'Emri',
   tk_var:'Ndryshime', tk_toread:'{0} për t’u lexuar', tk_done:'U krye', tk_empty:'Asnjë ndryshim për t’u lexuar.',
@@ -1748,8 +1766,6 @@ function initFirebase(){ try{ if(!firebaseApp())return false; fdb=firebase.datab
   fdb.ref('console/manut').on('value',snap=>{ const v=snap.val(); if(v){ MANUT=v; if(SESSION.role)renderModule(); } });
   // Compiti di base e check list: le scrive la Direzione, le leggono tutte.
   fdb.ref('console/compiti').on('value',snap=>{ const v=snap.val(); if(v){ COMPITI=compitiNorm(v); if(SESSION.role)renderModule(); } });
-  // Spunte della check list: personali ma condivise, cosi' la Direzione vede chi ha chiuso.
-  fdb.ref('checkdone').on('value',snap=>{ CHECKDONE=checkPulisci(snap.val()||{}); LS.set('abo_checkdone',CHECKDONE); if(SESSION.role)renderModule(); });
   // IMPOSTAZIONI condivise. Prima stavano solo nel telefono di chi scriveva: il post-it della
   // reception non arrivava ai piani e un testo fisso della Direzione non sarebbe mai uscito dal
   // suo telefono. Qui diventano di tutti, come stanze e collaboratori.
@@ -2727,23 +2743,25 @@ function viewPiani(){
    tastierino, che e' lo strumento vero di chi sta ai piani. */
 function compitiPanel(){
   const base=compitiDi(SESSION.name||'');
-  const lista=checkLista(SESSION.role);
-  if(!base.length&&!lista.length) return '';
-  const fatti=checkFattiDi(SESSION.prop,SESSION.name||'');
-  const nf=lista.filter(v=>fatti[v.id]).length;
-  const tutte=lista.length&&nf===lista.length;
+  const sez=guidaDi(SESSION.role);
+  if(!base.length&&!sez.length) return '';
   const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;');
   const bloccoBase=base.length?`<div class="ck-base"><div class="ck-sub">${t('ck_mine_base')}</div>
     <ul class="ck-ul">${base.map(r=>`<li>${esc(r)}</li>`).join('')}</ul></div>`:'';
-  const bloccoLista=lista.length?`<div class="ck-sub">${t('ck_mine_list')}</div>
-    <div class="ck-items">${lista.map(v=>{const on=fatti[v.id];
-      return `<button class="ck-item${on?' on':''}" onclick="checkToggle('${v.id}')">
-        <span class="ck-box">${on?'✓':''}</span>
-        <span class="ck-txt">${esc(v.txt)}</span>
-        ${on?`<span class="ck-time">${esc(on)}</span>`:''}</button>`;}).join('')}</div>`:'';
-  return `<details class="ck-panel${tutte?' allok':''}" ${tutte?'':'open'}>
-    <summary>📋 ${t('ck_mine_h')}${lista.length?`<span class="ck-cnt">${nf}/${lista.length}</span>`:''}${tutte?`<span class="ck-ok">${t('ck_done_all')}</span>`:''}</summary>
-    ${bloccoBase}${bloccoLista}</details>`;
+  // Ogni sezione si apre e chiude da sola: chiuse di partenza, cosi' la guida
+  // non copre il tastierino, che per chi sta ai piani e' lo strumento vero.
+  const bloccoGuida=sez.map(x=>{
+    const n=x.blocchi.reduce((k,b)=>k+b.voci.length,0);
+    const corpo=x.blocchi.map(b=>`${b.sub?`<div class="gd-sub">${esc(b.sub)}</div>`:''}
+        <ul class="gd-ul">${b.voci.map(v=>`<li>${esc(v)}</li>`).join('')}</ul>`).join('');
+    return `<details class="gd-sez"><summary>${esc(x.tit)}<span class="gd-n">${n}</span></summary>
+      <div class="gd-body">${corpo}</div></details>`;
+  }).join('');
+  return `<div class="ck-panel">
+    <div class="ck-cap">📋 ${t('ck_mine_h')}</div>
+    ${bloccoBase}
+    ${sez.length?`<div class="ck-sub">${t('ck_mine_guida')}</div><div class="gd-list">${bloccoGuida}</div>`:''}
+  </div>`;
 }
 function pianiRoomChangeBlock(myFloors){
   const d=DEMO[SESSION.prop]||{}; let cambi=d.cambi||[];
@@ -4179,7 +4197,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-11-28.1';
+const APP_VERSIONE='2026-11-28.2';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
@@ -5143,17 +5161,19 @@ function boCollab(){
 const CK_REPARTI=[['piani','r_piani'],['reception','r_reception'],['lavanderia','r_lav']];
 function boCompiti(){
   const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-  // 1. La check list fissa, una per reparto.
+  // 1. La guida del reparto: un'area di testo sola, con accanto l'anteprima di
+  //    come verra' letta. L'anteprima e' il punto: la Direzione vede subito se
+  //    una riga e' diventata una sezione o e' rimasta una voce, senza pubblicare.
   const blocchi=CK_REPARTI.map(([role,lbl])=>{
-    const arr=COMPITI.lista[role]||[];
-    const righe=arr.map((v,i)=>`<div class="ck-ed">
-        <span class="ck-num">${i+1}</span>
-        <input class="bo-inp ck-inp" value="${esc(v.txt||'')}" placeholder="${t('ck_voce_ph')}" onchange="ckSet('${role}',${i},this.value)">
-        <button class="bo-del" onclick="ckDel('${role}',${i})">🗑</button>
-      </div>`).join('');
-    return `<div class="ck-rep"><h3>${t(lbl)}<span class="ck-cnt">${arr.length}</span></h3>
-      ${righe||`<div class="ck-empty">${t('ck_vuota')}</div>`}
-      <button class="btn" onclick="ckAdd('${role}')">${t('ck_add')}</button></div>`;
+    const txt=(COMPITI.guida||{})[role]||'';
+    const sez=guidaParse(txt);
+    const voci=sez.reduce((k,x)=>k+x.blocchi.reduce((m,b)=>m+b.voci.length,0),0);
+    const prev=sez.length?sez.map(x=>`<div class="gp-sez">▸ ${esc(x.tit)}</div>`+
+        x.blocchi.map(b=>`${b.sub?`<div class="gp-sub">${esc(b.sub)}</div>`:''}<div class="gp-n">${b.voci.length} ${t('ck_voci')}</div>`).join('')
+      ).join(''):`<div class="ck-empty">${t('ck_vuota')}</div>`;
+    return `<div class="ck-rep"><h3>${t(lbl)}<span class="ck-cnt">${sez.length} / ${voci}</span></h3>
+      <textarea class="bo-ta gd-ta" rows="10" placeholder="${t('ck_guida_ph')}" onchange="guidaSet('${role}',this.value)">${esc(txt)}</textarea>
+      <div class="gp-h">${t('ck_prev')}</div><div class="gp-box">${prev}</div></div>`;
   }).join('');
   // 2. I compiti di base, uno per persona (solo chi ha accesso a questa struttura).
   const gente=COLLAB.filter(c=>c.role!=='admin'&&(c.prop===SESSION.prop||c.prop==='*'));
@@ -5173,38 +5193,19 @@ function boCompiti(){
       <textarea class="bo-ta" rows="2" placeholder="${t('daynote_ph')}" onchange="wdNoteSet(${k},this.value)">${esc(wd[k]||'')}</textarea>
     </div>`).join('');
   return `<h2 class="sec">${t('bo_compiti_h')}</h2><div class="lead">${t('bo_compiti_lead')}</div>
-    <h3 class="sec2">📋 ${t('ck_lista_h')}</h3><div class="lead">${t('ck_lista_lead')}</div>
+    <h3 class="sec2">📋 ${t('ck_guida_h')}</h3><div class="lead">${t('ck_guida_lead')}</div>
     <div class="ck-reps">${blocchi}</div>
     <h3 class="sec2">🙋 ${t('ck_pers_h')}</h3><div class="lead">${t('ck_pers_lead')}</div>
     <div class="ck-perslist">${pers||`<div class="ck-empty">${t('ck_nessuno')}</div>`}</div>
     <h3 class="sec2">🌸 ${t('daynote_h')}</h3><div class="lead">${t('daynote_fix_lead')}</div>
     <div class="pi-week">${gg}</div>
-    ${ckOggiBlock()}`;
+`;
 }
-function ckSet(role,i,val){ const a=COMPITI.lista[role]||[]; if(!a[i])return; a[i].txt=val; saveCompiti(); }
-function ckAdd(role){ (COMPITI.lista[role]=COMPITI.lista[role]||[]).push({id:newCid(),txt:''}); saveCompiti(); renderModule(); }
-function ckDel(role,i){ const a=COMPITI.lista[role]||[]; a.splice(i,1); saveCompiti(); renderModule(); }
+function guidaSet(role,val){ (COMPITI.guida=COMPITI.guida||{})[role]=String(val||''); saveCompiti(); renderModule(); }
 let CK_GENTE=[];
 function ckPersSet(i,val){ const c=CK_GENTE[i]; if(!c||!c.name)return; (COMPITI.pers=COMPITI.pers||{});
   if(String(val||'').trim()) COMPITI.pers[c.name]=val; else delete COMPITI.pers[c.name]; saveCompiti(); }
 function wdNoteSet(k,val){ const s=(SETTINGS[SESSION.prop]=SETTINGS[SESSION.prop]||{}); s.dayNoteWd=s.dayNoteWd||['','','','','','','']; s.dayNoteWd[k]=String(val||''); saveSettings(); renderModule(); }
-// Chi ha chiuso la check list oggi: e' questo che rende utile una lista spuntabile.
-function ckOggiBlock(){
-  const gente=COLLAB.filter(c=>c.role!=='admin'&&(c.prop===SESSION.prop||c.prop==='*')&&checkLista(c.role).length);
-  if(!gente.length) return '';
-  const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;');
-  const righe=gente.map(c=>{
-    const lista=checkLista(c.role), fatti=checkFattiDi(SESSION.prop,c.name||'');
-    const n=lista.filter(v=>fatti[v.id]).length;
-    const cl=n===0?'zero':(n===lista.length?'tutte':'parz');
-    const manca=lista.filter(v=>!fatti[v.id]).map(v=>v.txt);
-    return `<div class="ck-row ${cl}"><div class="ck-rn">${esc(c.name||'')}<span class="ck-prole">${t(c.role==='lavanderia'?'r_lav':'r_'+c.role)}</span></div>
-      <div class="ck-bar"><span style="width:${lista.length?Math.round(n/lista.length*100):0}%"></span></div>
-      <div class="ck-score">${n}/${lista.length}</div>
-      <div class="ck-miss">${n===0?t('ck_niente'):(manca.length?esc(manca.join(' · ')):t('ck_done_all'))}</div></div>`;
-  }).join('');
-  return `<h3 class="sec2">✅ ${t('ck_oggi_h')}</h3><div class="lead">${t('ck_oggi_lead')}</div><div class="ck-oggi">${righe}</div>`;
-}
 function boManutSet(i,field,val){ const arr=(MANUT[SESSION.prop]=MANUT[SESSION.prop]||[]); if(!arr[i])return; arr[i][field]=val; saveManut(); renderModule(); }
 function boDelManut(i){ const arr=(MANUT[SESSION.prop]=MANUT[SESSION.prop]||[]); arr.splice(i,1); saveManut(); renderModule(); }
 function boAddManut(){ const arr=(MANUT[SESSION.prop]=MANUT[SESSION.prop]||[]); arr.push({name:'',job:'',phone:''}); saveManut(); renderModule(); }
