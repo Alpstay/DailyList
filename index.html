@@ -263,6 +263,10 @@ h2.sec{font-family:var(--display);font-weight:700;font-size:19px;margin:0 0 2px}
 .gd-sub{font-family:var(--display);font-weight:700;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--acc);margin:9px 0 3px}
 .gd-ul{margin:0;padding-left:19px;font-size:14px;line-height:1.5;color:var(--slate)}
 .gd-ul li{margin-bottom:3px;overflow-wrap:anywhere}
+/* Selettore di lingua dei testi, e avviso di riserva sull'italiano. */
+.cklang{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:9px 0 2px}
+.cklang-l{font-family:var(--display);font-weight:700;font-size:10.5px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin-right:3px}
+.gd-fb{font-size:11px;color:var(--amber);background:var(--amber-bg);border-radius:7px;padding:4px 8px;margin-top:5px}
 /* Redattore: testo a sinistra, anteprima di come verra' letto. */
 .gd-ta{font-family:var(--body);font-size:12.5px;line-height:1.45;min-height:150px}
 .gp-h{font-family:var(--display);font-weight:700;font-size:10px;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:9px 0 3px}
@@ -850,7 +854,7 @@ function settingsNorm(src){
   ['saslong','hartmann','acadia'].forEach(pr=>{
     const s=o[pr]&&typeof o[pr]==='object'?o[pr]:{};
     const wd=Array.isArray(s.dayNoteWd)?s.dayNoteWd:[];
-    out[pr]=Object.assign({},s,{dayNoteWd:[0,1,2,3,4,5,6].map(i=>String(wd[i]||''))});
+    out[pr]=Object.assign({},s,{dayNoteWd:[0,1,2,3,4,5,6].map(i=>multiNorm(wd[i]))});
   });
   return out;
 }
@@ -884,7 +888,8 @@ const pinLookup=pin=>COLLAB.find(c=>c.pin===pin);
      ogni altra riga        -> una voce
    Cosi' la Direzione incolla il testo come ce l'ha, senza imparare simboli.
    --------------------------------------------------------- */
-const GUIDA_PIANI=`FERMATA
+const GUIDA_PIANI={
+  it:`FERMATA
 Camera:
 Passare aspirapolvere dappertutto (! sotto letto) + fare attenzione speciale se c'è cane (peli)
 Passare pavimento con mop bagnato alla fine
@@ -922,7 +927,125 @@ GIORNALIERO:
 Ognuno compito proprio (giroscale, bagni pubblici, lavanderia)
 Corridoio: passare aspirapolvere + togliere polvere sopra luci
 Oggetti smarriti: pubblicare foto
-Fine turno: ricontrollare ogni camera – disposizione letti corretto come su applicazione?`;
+Fine turno: ricontrollare ogni camera – disposizione letti corretto come su applicazione?`,
+  en:`STAY-OVER
+Room:
+Vacuum everywhere (! under the bed) + extra care if there is a dog (hair)
+Mop the floor with a wet mop at the end
+change the pillowcases
+Wash the glasses
+Air the room
+Make the beds
+More than 3 days: change linen + sheets + bed + towels
+Check the balconies and take out the rubbish
+Bathroom:
+empty the bin
+TOWELS: on the floor (change) – hanging and clean: leave
+
+DEPARTURE – ARRIVAL
+Room:
+Check the TV cable is plugged in and no cables are on show
+Close the zip on the mattress topper
+Clean the display cabinet (dust)
+Vacuum everywhere (! under the bed) + extra care if there was a dog (hair)
+Mop the floor with a wet mop at the end
+Wash the glasses
+Clean the fridge
+Empty the rubbish bin
+Clean the radiators – a lot of dust
+Clean the skirting boards in the rooms
+Clean the balconies
+Smell of smoke? message reception + run ozone 2x
+Bathroom:
+Check the soaps: one per person of each type
+2, 3 or 4 people – towel set
+Clean the shower drain – purple plug
+Clean the basin plug
+
+DAILY:
+Each her own task (stairwell, public toilets, laundry)
+Corridor: vacuum + dust the tops of the lights
+Lost property: post a photo
+End of shift: check every room again – bed layout correct as in the app?`,
+  ro:`CAMERĂ OCUPATĂ
+Cameră:
+Aspiră peste tot (! sub pat) + atenție specială dacă e câine (păr)
+La final, spală pardoseala cu mopul ud
+schimbă fețele de pernă
+Spală paharele
+Aerisește camera
+Fă paturile
+Peste 3 zile: schimbă lenjeria + cearceafurile + patul + prosoapele
+Verifică balcoanele și scoate gunoiul
+Baie:
+golește coșul
+PROSOAPE: pe jos (schimbă) – agățate și curate: lasă
+
+PLECARE – SOSIRE
+Cameră:
+Verifică dacă cablul TV e în priză și cablurile nu se văd
+Închide fermoarul la topperul patului
+Curăță vitrina (praf)
+Aspiră peste tot (! sub pat) + atenție specială dacă a fost câine (păr)
+La final, spală pardoseala cu mopul ud
+Spală paharele
+Curăță frigiderul
+Golește coșul de gunoi
+Curăță caloriferele – mult praf
+Curăță plintele din camere
+Curăță balcoanele
+Miros de fum? trimite mesaj la recepție + pune ozon 2x
+Baie:
+Verifică săpunurile: unul de persoană din fiecare tip
+2, 3 sau 4 persoane – set de prosoape
+Curăță scurgerea de la duș – dop mov
+Curăță dopul de la chiuvetă
+
+ZILNIC:
+Fiecare cu sarcina ei (casa scării, toalete publice, spălătorie)
+Hol: aspiră + șterge praful de pe lămpi
+Obiecte pierdute: publică fotografia
+Final de tură: verifică din nou fiecare cameră – dispunerea paturilor corectă ca în aplicație?`,
+  sq:`DHOMË E ZËNË
+Dhoma:
+Fshi me fshesë me korrent kudo (! nën krevat) + kujdes i veçantë nëse ka qen (qime)
+Në fund fshi dyshemenë me mop të lagur
+ndërro këllëfët e jastëkëve
+Laj gotat
+Ajros dhomën
+Rregullo krevatet
+Mbi 3 ditë: ndërro lirinë + çarçafët + krevatin + peshqirët
+Kontrollo ballkonet dhe hiq mbeturinat
+Banjo:
+zbraz koshin
+PESHQIRË: përtokë (ndërro) – të varur dhe të pastër: lëri
+
+NISJE – ARDHJE
+Dhoma:
+Kontrollo që kablloja e TV-së të jetë në prizë dhe kabllot të mos duken
+Mbyll zinxhirin e topperit të krevatit
+Pastro vitrinën (pluhur)
+Fshi me fshesë me korrent kudo (! nën krevat) + kujdes i veçantë nëse ka pasur qen (qime)
+Në fund fshi dyshemenë me mop të lagur
+Laj gotat
+Pastro frigoriferin
+Zbraz koshin e mbeturinave
+Pastro radiatorët – shumë pluhur
+Pastro bordurat e dyshemesë në dhoma
+Pastro ballkonet
+Erë duhani? dërgo mesazh në recepsion + vendos ozon 2x
+Banjo:
+Kontrollo sapunët: një për person nga çdo lloj
+2, 3 ose 4 persona – set peshqirësh
+Pastro kanalin e dushit – tapa vjollcë
+Pastro tapën e lavamanit
+
+ÇDO DITË:
+Secila me detyrën e vet (shkallët, tualetet publike, lavanderia)
+Korridori: fshi me fshesë + hiq pluhurin mbi dritat
+Sende të humbura: publiko foton
+Fundi i turnit: rikontrollo çdo dhomë – vendosja e krevateve e saktë si në aplikacion?`
+};
 function seedCompiti(){ return {
   guida:{
     piani:GUIDA_PIANI,
@@ -932,10 +1055,22 @@ function seedCompiti(){ return {
   pers:{},
 }; }
 let COMPITI=LS.get('abo_compiti',null)||seedCompiti();
+// Un testo scritto dall'azienda in piu' lingue. Chi legge vede la sua; se in
+// quella lingua non e' stato scritto niente, vede l'italiano invece del vuoto:
+// meglio una riga da farsi tradurre che nessuna riga.
+// L'elenco sta dentro la funzione di proposito: settingsNorm gira prima che
+// una costante dichiarata qui sia inizializzata, e la lettura fallirebbe.
+function multiNorm(v){
+  const o={it:'',en:'',ro:'',sq:''};
+  if(typeof v==='string') o.it=v;                       // dato vecchio a una lingua sola
+  else if(v&&typeof v==='object') ['it','en','ro','sq'].forEach(l=>{ o[l]=String(v[l]||''); });
+  return o;
+}
+const testoIn=v=>{ const o=multiNorm(v); return o[LANG]||o.it||''; };
 function compitiNorm(src){
   const o=src&&typeof src==='object'?src:{};
   const g=o.guida&&typeof o.guida==='object'?o.guida:{};
-  return {guida:{piani:String(g.piani||''),reception:String(g.reception||''),lavanderia:String(g.lavanderia||'')},
+  return {guida:{piani:multiNorm(g.piani),reception:multiNorm(g.reception),lavanderia:multiNorm(g.lavanderia)},
           pers:o.pers&&typeof o.pers==='object'?o.pers:{}};
 }
 COMPITI=compitiNorm(COMPITI);
@@ -960,7 +1095,7 @@ function guidaParse(txt){
   });
   return out.filter(x=>x.blocchi.some(b=>b.voci.length));
 }
-const guidaDi=role=>guidaParse((COMPITI.guida||{})[role]||'');
+const guidaDi=role=>guidaParse(testoIn((COMPITI.guida||{})[role]));
 
 /* =========================================================
    MULTILINGUA (it · en · ro · sq)
@@ -1009,7 +1144,7 @@ const I18N={
   bo_collab_h:'Collaboratori & accessi', bo_collab_lead:'Ogni collaboratore entra col proprio PIN solo nel reparto e nella struttura assegnata. “Tutte le strutture” = può cambiare struttura.', bo_add:'+ Aggiungi',
   bo_compiti:'Compiti', bo_compiti_h:'Compiti di base & check list', bo_compiti_lead:'La check list è fissa: la scrivi una volta per reparto e ogni giorno riparte da zero per tutte. I compiti di base sono della singola persona e servono per ciò che la distingue: i suoi piani, la sua mansione.',
   ck_guida_h:'Guida del reparto', ck_guida_lead:'Il modo di fare le stanze, uguale per tutte. Scrivilo come lo scriveresti su carta: una riga TUTTA MAIUSCOLA diventa una sezione che si apre e chiude con la freccia, una riga che finisce con i due punti diventa un sottotitolo, ogni altra riga è una voce. L\'anteprima a destra mostra subito come verrà letta.',
-  ck_voci:'voci', ck_prev:'Come la vedranno', ck_vuota:'Niente di scritto: il reparto non vedrà nessuna guida.', ck_guida_ph:'FERMATA\nCamera:\nPassare aspirapolvere dappertutto\nRifare letti\nBagno:\nsvuotare bidone',
+  ck_voci:'voci', ck_prev:'Come la vedranno', ck_lang:'Scrivi in:', ck_fallback:'Vuoto in questa lingua: chi legge vedrà l\'italiano.', ck_vuota:'Niente di scritto: il reparto non vedrà nessuna guida.', ck_guida_ph:'FERMATA\nCamera:\nPassare aspirapolvere dappertutto\nRifare letti\nBagno:\nsvuotare bidone',
   ck_pers_h:'Compiti di base per persona', ck_pers_lead:'Testo libero, una riga per compito. Lo vede solo lei, insieme alla check list del suo reparto.',
   ck_pers_ph:'es. 1° e 2° piano\nControllo frigobar al 2°', ck_none_pers:'Nessun compito di base scritto.',
   ck_mine_h:'I miei compiti', ck_mine_base:'I tuoi compiti di base', ck_mine_guida:'Come si fanno le stanze',
@@ -1061,7 +1196,7 @@ const I18N={
   bo_collab_h:'Staff & access', bo_collab_lead:'Each person signs in with their PIN only for their department and assigned property. “All properties” = can switch property.', bo_add:'+ Add',
   bo_compiti:'Duties', bo_compiti_h:'Basic duties & checklist', bo_compiti_lead:'The checklist is fixed: write it once per department and it starts again from zero every day, the same for everyone. Basic duties belong to one person and cover what sets her apart: her floors, her job.',
   ck_guida_h:'Department guide', ck_guida_lead:'How the rooms are done, the same for everyone. Write it as you would on paper: a line in ALL CAPITALS becomes a section that opens and closes with the arrow, a line ending in a colon becomes a sub-heading, every other line is an item. The preview shows at once how it will read.',
-  ck_voci:'items', ck_prev:'How they will see it', ck_vuota:'Nothing written: the department will see no guide.', ck_guida_ph:'STAY-OVER\nRoom:\nVacuum everywhere\nMake the beds\nBathroom:\nempty the bin',
+  ck_voci:'items', ck_prev:'How they will see it', ck_lang:'Write in:', ck_fallback:'Empty in this language: readers will see the Italian.', ck_vuota:'Nothing written: the department will see no guide.', ck_guida_ph:'STAY-OVER\nRoom:\nVacuum everywhere\nMake the beds\nBathroom:\nempty the bin',
   ck_pers_h:'Basic duties per person', ck_pers_lead:'Free text, one line per duty. Only she sees it, next to her department checklist.',
   ck_pers_ph:'e.g. 1st and 2nd floor\nMinibar check on the 2nd', ck_none_pers:'No basic duties written.',
   ck_mine_h:'My duties', ck_mine_base:'Your basic duties', ck_mine_guida:'How the rooms are done',
@@ -1113,7 +1248,7 @@ const I18N={
   bo_collab_h:'Colaboratori & acces', bo_collab_lead:'Fiecare intră cu PIN-ul propriu doar în departamentul și structura alocată. „Toate structurile” = poate schimba structura.', bo_add:'+ Adaugă',
   bo_compiti:'Sarcini', bo_compiti_h:'Sarcini de bază & check list', bo_compiti_lead:'Check lista este fixă: o scrii o dată pentru departament și în fiecare zi pornește de la zero, aceeași pentru toate. Sarcinile de bază sunt ale persoanei și acoperă ce o deosebește: etajele ei, munca ei.',
   ck_guida_h:'Ghidul departamentului', ck_guida_lead:'Cum se fac camerele, la fel pentru toate. Scrie-l cum l-ai scrie pe hârtie: o linie TOATĂ CU MAJUSCULE devine o secțiune care se deschide și se închide cu săgeata, o linie care se termină cu două puncte devine un subtitlu, orice altă linie este un punct. Previzualizarea arată imediat cum va fi citit.',
-  ck_voci:'puncte', ck_prev:'Cum vor vedea', ck_vuota:'Nimic scris: departamentul nu va vedea niciun ghid.', ck_guida_ph:'OPRIRE\nCameră:\nAspiră peste tot\nFă paturile\nBaie:\ngolește coșul',
+  ck_voci:'puncte', ck_prev:'Cum vor vedea', ck_lang:'Scrie în:', ck_fallback:'Gol în această limbă: cine citește va vedea italiana.', ck_vuota:'Nimic scris: departamentul nu va vedea niciun ghid.', ck_guida_ph:'OPRIRE\nCameră:\nAspiră peste tot\nFă paturile\nBaie:\ngolește coșul',
   ck_pers_h:'Sarcini de bază pentru fiecare', ck_pers_lead:'Text liber, o linie pentru fiecare sarcină. O vede doar ea, lângă check lista departamentului.',
   ck_pers_ph:'ex. Etajul 1 și 2\nControl minibar la etajul 2', ck_none_pers:'Nicio sarcină de bază scrisă.',
   ck_mine_h:'Sarcinile mele', ck_mine_base:'Sarcinile tale de bază', ck_mine_guida:'Cum se fac camerele',
@@ -1165,7 +1300,7 @@ const I18N={
   bo_collab_h:'Stafi & aksesi', bo_collab_lead:'Secili hyn me PIN-in e vet vetëm në repartin dhe strukturën e caktuar. „Të gjitha strukturat” = mund të ndryshojë strukturën.', bo_add:'+ Shto',
   bo_compiti:'Detyrat', bo_compiti_h:'Detyrat bazë & check lista', bo_compiti_lead:'Check lista është e fiksuar: e shkruan një herë për repartin dhe çdo ditë niset nga zero, e njëjtë për të gjitha. Detyrat bazë janë të personit dhe mbulojnë atë që e dallon: katet e saj, puna e saj.',
   ck_guida_h:'Udhëzuesi i repartit', ck_guida_lead:'Si bëhen dhomat, njësoj për të gjitha. Shkruaje si do ta shkruaje në letër: një rresht KRYESISHT ME SHKRONJA TË MËDHA bëhet një seksion që hapet dhe mbyllet me shigjetë, një rresht që mbaron me dy pika bëhet nëntitull, çdo rresht tjetër është një pikë. Parashikimi tregon menjëherë si do të lexohet.',
-  ck_voci:'pika', ck_prev:'Si do ta shohin', ck_vuota:'Asgjë e shkruar: reparti nuk do të shohë asnjë udhëzues.', ck_guida_ph:'QËNDRIM\nDhoma:\nFshi me fshesë kudo\nRregullo krevatet\nBanjo:\nzbraz koshin',
+  ck_voci:'pika', ck_prev:'Si do ta shohin', ck_lang:'Shkruaj në:', ck_fallback:'Bosh në këtë gjuhë: lexuesi do të shohë italishten.', ck_vuota:'Asgjë e shkruar: reparti nuk do të shohë asnjë udhëzues.', ck_guida_ph:'QËNDRIM\nDhoma:\nFshi me fshesë kudo\nRregullo krevatet\nBanjo:\nzbraz koshin',
   ck_pers_h:'Detyrat bazë për person', ck_pers_lead:'Tekst i lirë, një rresht për detyrë. E shikon vetëm ajo, pranë check listës së repartit.',
   ck_pers_ph:'p.sh. Kati 1 dhe 2\nKontroll minibar në katin 2', ck_none_pers:'Asnjë detyrë bazë e shkruar.',
   ck_mine_h:'Detyrat e mia', ck_mine_base:'Detyrat e tua bazë', ck_mine_guida:'Si bëhen dhomat',
@@ -2664,7 +2799,7 @@ function nomeGiorno(wd){
 }
 // Testo FISSO del post-it per il giorno della settimana: lo scrive la Direzione una
 // volta e torna ogni settimana. Non scade: scade solo l'aggiunta della reception.
-function dayNoteFisso(prop,wd){ const st=SETTINGS[prop]||{}; const arr=st.dayNoteWd||[]; return String(arr[(wd===undefined?weekdayOggi():wd)]||'').trim(); }
+function dayNoteFisso(prop,wd){ const st=SETTINGS[prop]||{}; const arr=st.dayNoteWd||[]; return testoIn(arr[(wd===undefined?weekdayOggi():wd)]).trim(); }
 function dayNotePostit(editable){
   checkDayNoteExpiry(SESSION.prop);
   const fisso=dayNoteFisso(SESSION.prop);
@@ -4197,7 +4332,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-11-28.3';
+const APP_VERSIONE='2026-11-28.4';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
@@ -5164,11 +5299,11 @@ function boCollab(){
 const CK_REPARTI=[['piani','r_piani'],['reception','r_reception'],['lavanderia','r_lav']];
 function boCompiti(){
   const esc=x=>String(x).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;');
-  // 1. La guida del reparto: un'area di testo sola, con accanto l'anteprima di
-  //    come verra' letta. L'anteprima e' il punto: la Direzione vede subito se
-  //    una riga e' diventata una sezione o e' rimasta una voce, senza pubblicare.
+  // 1. La guida del reparto, nella lingua scelta col selettore qui sopra.
+  //    L'anteprima e' il punto: la Direzione vede subito se una riga e'
+  //    diventata una sezione o e' rimasta una voce, senza pubblicare.
   const blocchi=CK_REPARTI.map(([role,lbl])=>{
-    const txt=(COMPITI.guida||{})[role]||'';
+    const txt=multiNorm((COMPITI.guida||{})[role])[CKLANG]||'';
     const sez=guidaParse(txt);
     const voci=sez.reduce((k,x)=>k+x.blocchi.reduce((m,b)=>m+b.voci.length,0),0);
     const prev=sez.length?sez.map(x=>`<div class="gp-sez">▸ ${esc(x.tit)}</div>`+
@@ -5176,6 +5311,7 @@ function boCompiti(){
       ).join(''):`<div class="ck-empty">${t('ck_vuota')}</div>`;
     return `<div class="ck-rep"><h3>${t(lbl)}<span class="ck-cnt">${sez.length} / ${voci}</span></h3>
       <textarea class="bo-ta gd-ta" rows="10" placeholder="${t('ck_guida_ph')}" onchange="guidaSet('${role}',this.value)">${esc(txt)}</textarea>
+      ${CKLANG!=='it'&&!txt.trim()&&multiNorm((COMPITI.guida||{})[role]).it.trim()?`<div class="gd-fb">${t('ck_fallback')}</div>`:''}
       <div class="gp-h">${t('ck_prev')}</div><div class="gp-box">${prev}</div></div>`;
   }).join('');
   // 2. I compiti di base, uno per persona (solo chi ha accesso a questa struttura).
@@ -5191,11 +5327,17 @@ function boCompiti(){
   //    volta e torna ogni settimana; la reception ci aggiunge sopra solo l'oggi.
   const oggiWd=weekdayOggi();
   const st=SETTINGS[SESSION.prop]||{}; const wd=st.dayNoteWd||[];
-  const gg=[1,2,3,4,5,6,0].map(k=>`<div class="pi-ed${k===oggiWd?' oggi':''}">
+  const gg=[1,2,3,4,5,6,0].map(k=>{ const v=multiNorm(wd[k])[CKLANG]||'';
+    return `<div class="pi-ed${k===oggiWd?' oggi':''}">
       <div class="pi-gg">${nomeGiorno(k)}${k===oggiWd?`<span class="pi-now">${t('rd_today')}</span>`:''}</div>
-      <textarea class="bo-ta" rows="2" placeholder="${t('daynote_ph')}" onchange="wdNoteSet(${k},this.value)">${esc(wd[k]||'')}</textarea>
-    </div>`).join('');
-  return `<h2 class="sec">${t('bo_compiti_h')}</h2><div class="lead">${t('bo_compiti_lead')}</div>
+      <textarea class="bo-ta" rows="2" placeholder="${t('daynote_ph')}" onchange="wdNoteSet(${k},this.value)">${esc(v)}</textarea>
+      ${CKLANG!=='it'&&!v.trim()&&multiNorm(wd[k]).it.trim()?`<div class="gd-fb">${t('ck_fallback')}</div>`:''}
+    </div>`; }).join('');
+  // Un solo selettore per tutti i testi della scheda: i campi sono gia' tanti,
+  // moltiplicarli per quattro lingue li renderebbe illeggibili.
+  const chips=`<div class="cklang"><span class="cklang-l">${t('ck_lang')}</span>${LANGS.map(([c,n])=>
+    `<button class="toggle sm ${CKLANG===c?'on':''}" onclick="setCkLang('${c}')">${n}</button>`).join('')}</div>`;
+  return `<h2 class="sec">${t('bo_compiti_h')}</h2><div class="lead">${t('bo_compiti_lead')}</div>${chips}
     <h3 class="sec2">📋 ${t('ck_guida_h')}</h3><div class="lead">${t('ck_guida_lead')}</div>
     <div class="ck-reps">${blocchi}</div>
     <h3 class="sec2">🙋 ${t('ck_pers_h')}</h3><div class="lead">${t('ck_pers_lead')}</div>
@@ -5204,11 +5346,13 @@ function boCompiti(){
     <div class="pi-week">${gg}</div>
 `;
 }
-function guidaSet(role,val){ (COMPITI.guida=COMPITI.guida||{})[role]=String(val||''); saveCompiti(); renderModule(); }
+let CKLANG='it';
+function setCkLang(l){ CKLANG=l; renderModule(); }
+function guidaSet(role,val){ const g=(COMPITI.guida=COMPITI.guida||{}); const o=multiNorm(g[role]); o[CKLANG]=String(val||''); g[role]=o; saveCompiti(); renderModule(); }
 let CK_GENTE=[];
 function ckPersSet(i,val){ const c=CK_GENTE[i]; if(!c||!c.name)return; (COMPITI.pers=COMPITI.pers||{});
   if(String(val||'').trim()) COMPITI.pers[c.name]=val; else delete COMPITI.pers[c.name]; saveCompiti(); }
-function wdNoteSet(k,val){ const s=(SETTINGS[SESSION.prop]=SETTINGS[SESSION.prop]||{}); s.dayNoteWd=s.dayNoteWd||['','','','','','','']; s.dayNoteWd[k]=String(val||''); saveSettings(); renderModule(); }
+function wdNoteSet(k,val){ const s=(SETTINGS[SESSION.prop]=SETTINGS[SESSION.prop]||{}); s.dayNoteWd=s.dayNoteWd||[0,1,2,3,4,5,6].map(()=>multiNorm('')); const o=multiNorm(s.dayNoteWd[k]); o[CKLANG]=String(val||''); s.dayNoteWd[k]=o; saveSettings(); renderModule(); }
 function boManutSet(i,field,val){ const arr=(MANUT[SESSION.prop]=MANUT[SESSION.prop]||[]); if(!arr[i])return; arr[i][field]=val; saveManut(); renderModule(); }
 function boDelManut(i){ const arr=(MANUT[SESSION.prop]=MANUT[SESSION.prop]||[]); arr.splice(i,1); saveManut(); renderModule(); }
 function boAddManut(){ const arr=(MANUT[SESSION.prop]=MANUT[SESSION.prop]||[]); arr.push({name:'',job:'',phone:''}); saveManut(); renderModule(); }
