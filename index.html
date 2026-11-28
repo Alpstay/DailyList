@@ -2040,7 +2040,10 @@ const TIC_ICON={time:'🕗',change:'🔄',move:'🔀',add:'➕',cancel:'❌',rea
 // e sincronizzate nella databox (nuovi arrivi, cambi orario/camera/letti, annullamenti).
 // La stanza si porta dietro l'avviso: serve a mandarlo al piano giusto e a
 // farlo sparire quando il guasto viene chiuso.
-const stanzaDa=x=>{ const m=String(x==null?'':x).match(/^\s*(\d{1,4})\b/); return m?m[1]:null; };
+// Il numero in testa al messaggio, anche se preceduto da "stanza"/"camera":
+// la reception scrive sia "220 pavimento sporco" sia "Stanza 220 ...".
+const stanzaDa=x=>{ const m=String(x==null?'':x)
+  .match(/^\s*(?:stanza|camera|zimmer|room|dhoma)?\s*[#.:]?\s*(\d{1,4})\b/i); return m?m[1]:null; };
 function pushTicker(prop,type,key,params){ TICKER.unshift({id:newTid(),prop,type,key,params:params||[],rn:stanzaDa((params||[])[0]),t:nowHM(),read:false}); saveTicker(); }
 const TK_ALLOWED=['change','move','note','maint']; // solo: disposizione letti, cambio stanza, note manuali, manutenzione
 function guastoAperto(prop,rn){ return !!(MAINT[prop]&&MAINT[prop][rn]); }
@@ -2052,11 +2055,38 @@ function guastoAperto(prop,rn){ return !!(MAINT[prop]&&MAINT[prop][rn]); }
 // ragazza del primo piano non serve sapere che al terzo manca un asciugamano,
 // e una bacheca piena di cose altrui si smette di leggere. Gli avvisi senza
 // numero di stanza (le note generali) restano per tutti.
+// Il piano di una stanza: prima l'anagrafica, e se la stanza non c'e' la
+// prima cifra del numero (101 -> 1, 220 -> 2), che e' la convenzione di tutte
+// e tre le case. Serve perche' un avviso su una stanza non ancora inserita in
+// anagrafica spariva per TUTTE: la reception lo vedeva (non ha piani
+// assegnati) e lo dava per mandato, mentre ai piani non arrivava niente.
+function pianoDiStanza(prop,rn){
+  const r=getRoom(prop,rn);
+  if(r&&r.floor) return r.floor;
+  const n=String(rn||'');
+  return /^[1-9]\d{2,3}$/.test(n) ? n.charAt(0)+'° Piano' : null;
+}
+// Confronto tollerante: "2° Piano", "2 piano", "Piano 2" e "2°piano" sono lo
+// stesso piano. Un refuso nell'etichetta non deve far sparire un avviso.
+function cifraPiano(x){ const m=String(x==null?'':x).match(/\d{1,2}/); return m?m[0]:null; }
+function normPiano(x){ return String(x==null?'':x).toLowerCase()
+  .normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]/g,''); }
+function stessoPiano(a,b){
+  if(!a||!b) return false;
+  const ca=cifraPiano(a), cb=cifraPiano(b);
+  if(ca&&cb) return ca===cb;
+  return normPiano(a)===normPiano(b);
+}
 function tickerVisibile(e,prop){
   if(SESSION.role==='admin') return true;
   const miei=SESSION.floors||[];
   if(!miei.length||!e.rn) return true;
-  return miei.indexOf(floorOf(e.prop==='*'?prop:e.prop,e.rn))>=0;
+  const piano=pianoDiStanza(e.prop==='*'?prop:e.prop, e.rn);
+  // Piano indeterminabile: l'avviso va a tutte. Un avviso letto da chi non lo
+  // riguarda costa due secondi; un avviso che non arriva a nessuno costa una
+  // stanza non pulita.
+  if(!piano) return true;
+  return miei.some(m=>stessoPiano(m,piano));
 }
 function tickerFor(prop){ return TICKER.filter(e=>!e.read && TK_ALLOWED.indexOf(e.type)>=0 && (e.prop===prop||e.prop==='*')
   && !(e.type==='maint' && e.rn && !guastoAperto(e.prop==='*'?prop:e.prop,e.rn))
@@ -4427,7 +4457,7 @@ function scatolaBanner(){
 const FONTE_FILE={ url:'scatola.json', intervalloMs:300000 };
 // Alzare a ogni pubblicazione: compare in testa a ogni schermata, cosi' si
 // vede subito quale versione e' effettivamente online.
-const APP_VERSIONE='2026-11-28.11';
+const APP_VERSIONE='2026-11-28.12';
 
 function scatolaDaFilePossibile(){
   return location.protocol==='http:'||location.protocol==='https:';
